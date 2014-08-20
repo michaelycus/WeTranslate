@@ -80,6 +80,26 @@ Route::group(array('before' => 'auth'), function(){
 		'uses' => 'VideoController@getFinished'
 	));
 
+	Route::get('/videos/for-approval', array(
+		'as' => 'videos-for-approval',
+		'uses' => 'VideoController@getForApproval'
+	));
+
+	Route::post('/videos/for-approval', array(
+		'as' => 'videos-for-approval-post',
+		'uses' => 'VideoController@postForApproval'
+	));
+
+	Route::get('/videos/verify/{id}', array(
+		'as' => 'videos-verify',
+		'uses' => 'VideoController@getVerify'
+	));
+
+	Route::post('/videos/verify/{id}', array(
+		'as' => 'videos-verify-post',
+		'uses' => 'VideoController@postVerify'
+	));
+
 	Route::get('/videos/suggest', array(
 		'as' => 'videos-suggest',
 		'uses' => 'VideoController@getSuggest'
@@ -88,6 +108,11 @@ Route::group(array('before' => 'auth'), function(){
 	Route::post('/videos/suggest', array(
 		'as' => 'videos-suggest-post',
 		'uses' => 'VideoController@postSuggest'
+	));
+
+	Route::get('/videos/details/{id}', array(
+		'as' => 'videos-details',
+		'uses' => 'VideoController@getDetails'
 	));
 
 	/*
@@ -109,7 +134,6 @@ Route::group(array('before' => 'auth'), function(){
 		$json = json_decode(file_get_contents("http://gdata.youtube.com/feeds/api/videos/$matches[0]?v=2&alt=jsonc"));
     	echo '<img src="' . $json->data->thumbnail->sqDefault . '">';
     	echo ' '. $json->data->title . ' ';
-
 
 	    return 'Users! '. $matches[0];
 	});
@@ -165,3 +189,5 @@ Route::group(array('before' => 'guest'), function(){
 	));		
 
 });
+
+Validator::extend('awesome', 'CustomValidation@awesome');

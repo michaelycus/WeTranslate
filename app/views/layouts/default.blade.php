@@ -20,6 +20,7 @@
 	<link href="{{ URL::asset('assets/stylesheets/pages.min.css') }}" rel="stylesheet" type="text/css">
 	<link href="{{ URL::asset('assets/stylesheets/rtl.min.css') }}" rel="stylesheet" type="text/css">
 	<link href="{{ URL::asset('assets/stylesheets/themes.min.css') }}" rel="stylesheet" type="text/css">
+	<link href="{{ URL::asset('assets/stylesheets/custom.css') }}" rel="stylesheet" type="text/css">
 
 	<!--[if lt IE 9]>
 		<script src="assets/javascripts/ie.min.js"></script>
@@ -54,45 +55,11 @@
 
 			<div id="main-navbar-collapse" class="collapse navbar-collapse main-navbar-collapse">
 				<div>
-					<ul class="nav navbar-nav">
-						<li>
-							<a href="#">Home</a>
-						</li>
-						<li class="dropdown">
-							<a href="#" class="dropdown-toggle" data-toggle="dropdown">Dropdown</a>
-							<ul class="dropdown-menu">
-								<li><a href="#">First item</a></li>
-								<li><a href="#">Second item</a></li>
-								<li class="divider"></li>
-								<li><a href="#">Third item</a></li>
-							</ul>
-						</li>
-					</ul> <!-- / .navbar-nav -->
 
 					<div class="right clearfix">
 						<ul class="nav navbar-nav pull-right right-navbar-nav">
-
-							<li class="nav-icon-btn nav-icon-btn-danger dropdown">
-								<a href="#notifications" class="dropdown-toggle" data-toggle="dropdown">
-									<span class="label">5</span>
-									<i class="nav-icon fa fa-bullhorn"></i>
-									<span class="small-screen-text">Notifications</span>
-								</a>								
-							</li>
-							<li class="nav-icon-btn nav-icon-btn-success dropdown">
-								<a href="#messages" class="dropdown-toggle" data-toggle="dropdown">
-									<span class="label">10</span>
-									<i class="nav-icon fa fa-envelope"></i>
-									<span class="small-screen-text">Income messages</span>
-								</a>
-							</li>
 <!-- /3. $END_NAVBAR_ICON_BUTTONS -->
 
-							<li>
-								<form class="navbar-form pull-left">
-									<input type="text" class="form-control" placeholder="Search">
-								</form>
-							</li>
 
 							<li class="dropdown">
 								<a href="#" class="dropdown-toggle user-menu" data-toggle="dropdown">
@@ -137,22 +104,22 @@
 			</div>
 			<ul class="navigation">
 				<li>
-					<a href="index.html"><i class="menu-icon fa fa-dashboard"></i><span class="mm-text">Dashboard</span></a>
+					<!-- <a href="index.html"><i class="menu-icon fa fa-dashboard"></i><span class="mm-text">Dashboard</span></a> -->
 				</li>
 				<li>
-					<a href="{{ URL::route('videos-translating') }}"><i class="menu-icon fa fa-tasks"></i><span class="mm-text">Translating</span></a>
+					<a href="{{ URL::route('videos-translating') }}"><i class="menu-icon fa fa-clipboard"></i><span class="mm-text">Translating</span></a>
 				</li>
 				<li>
-					<a href="{{ URL::route('videos-synchronizing') }}"><i class="menu-icon fa fa-tasks"></i><span class="mm-text">Synchronizing</span></a>
+					<a href="{{ URL::route('videos-synchronizing') }}"><i class="menu-icon fa fa-clock-o"></i><span class="mm-text">Synchronizing</span></a>
 				</li>
 				<li>
-					<a href="{{ URL::route('videos-proofreading') }}"><i class="menu-icon fa fa-tasks"></i><span class="mm-text">Proofreading</span></a>
+					<a href="{{ URL::route('videos-proofreading') }}"><i class="menu-icon fa fa-search-plus"></i><span class="mm-text">Proofreading</span></a>
 				</li>	
 				<li>
-					<a href="{{ URL::route('videos-finished') }}"><i class="menu-icon fa fa-tasks"></i><span class="mm-text">Finished</span></a>
+					<a href="{{ URL::route('videos-finished') }}"><i class="menu-icon fa fa-check"></i><span class="mm-text">Finished</span></a>
 				</li>				
 				<li>
-					<a href="{{ URL::route('videos-finished') }}"><i class="menu-icon fa fa-tasks"></i><span class="mm-text">Need Approval</span></a>
+					<a href="{{ URL::route('videos-for-approval') }}"><i class="menu-icon fa fa-legal"></i><span class="mm-text">For Approval</span></a>
 				</li>		
 				
 			</ul> <!-- / .navigation -->

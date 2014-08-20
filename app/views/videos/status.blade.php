@@ -1,59 +1,103 @@
 @extends('layouts.default')
 
 @section('content')
-	<!-- Javascript -->
-	<script>
-		init.push(function () {
-			$('#jq-datatables-example').dataTable();
-			$('#jq-datatables-example_wrapper .table-caption').text('');
-			$('#jq-datatables-example_wrapper .dataTables_filter input').attr('placeholder', 'Search...');
-		});
-	</script>
-	<!-- / Javascript -->
 
-	<div class="panel">
-		<div class="panel-heading">
-			<span class="panel-title">Videos in translation</span>
-		</div>
-		<div class="panel-body">
-			<div class="table-primary">
-				<table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered" id="jq-datatables-example">
-					<thead>
-						<tr>
-							<th></th>
-							<th>Title</th>
-                            <th>Links</th>
-                            <th>Duration</th>
-                            <th>Start Date</th>
-                            <th>Who is working...</th>
-                            <th></th>
-						</tr>
-					</thead>
-					<tbody>
-						@foreach ($videos as $video)
-                        	<tr>
-                        		<?php
-									preg_match("#(?<=v=)[a-zA-Z0-9-]+(?=&)|(?<=v\/)[^&\n]+(?=\?)|(?<=v=)[^&\n]+|(?<=youtu.be/)[^&\n]+#",  $video->original_link, $matches);
+<div class="page-header">
+	<h1><span class="text-light-gray">UI Elements / </span>Panels</h1>
+</div> <!-- / .page-header -->
 
-									$json = json_decode(file_get_contents("http://gdata.youtube.com/feeds/api/videos/$matches[0]?v=2&alt=jsonc"));
-                        		?>	
 
-                        		<td>{{ '<img src="' . $json->data->thumbnail->sqDefault . '">' }}</td>
-                        		<td>{{ $json->data->title }}</td>
-                        		<td>{{ $video->original_link .' - '. $video->working_link }}</td>
-                        		<td>{{ $video->duration }}</td>
-                        		<td>{{ date("Y/m/d",strtotime($video->created_at)) }}</td>
-                        		<td> - </td>
-                        		<td>
-                        			<button class="btn btn btn-xs btn-labeled btn-warning"><span class="btn-label icon fa fa-edit"></span>Edit</button> 
-                        			<button class="btn btn btn-xs btn-labeled btn-danger"><span class="btn-label icon fa fa-trash-o"></span>Delete</button> </td>
-							</tr>
-						@endforeach
-					</tbody>
-				</table>
+@foreach ($videos as $video)
+<?php
+	preg_match("#(?<=v=)[a-zA-Z0-9-]+(?=&)|(?<=v\/)[^&\n]+(?=\?)|(?<=v=)[^&\n]+|(?<=youtu.be/)[^&\n]+#",  $video->original_link, $matches);
+
+	$json = json_decode(file_get_contents("http://gdata.youtube.com/feeds/api/videos/$matches[0]?v=2&alt=jsonc"));
+?>	
+
+<div class="row">
+
+	<div class="col-md-12">
+
+		<div class="panel colourable">
+			<div class="panel-heading">
+				<span class="panel-title">{{ $json->data->title }}</span>
+				<div class="panel-heading-controls">
+					<span class="label label-tag label-warning">Need proofreading</span>
+				</div>
 			</div>
+			<div class="panel-body">
+				<div class="col-md-2 text-center text-lg">
+					
+					{{ '<img src="' . $json->data->thumbnail->sqDefault . '">' }}					
+
+				</div>
+				
+				<div class="col-md-4 text-center text-lg">
+					<p><img src="http://wetranslate.dev:8000/assets/demo/avatars/1.jpg" alt="" class="user-list">
+					<img src="http://wetranslate.dev:8000/assets/demo/avatars/2.jpg" alt="" class="user-list">
+					<img src="http://wetranslate.dev:8000/assets/demo/avatars/3.jpg" alt="" class="user-list"></p>
+					<p>
+						<button class="btn btn-flat btn-sm btn-labeled btn-success"><span class="btn-label icon fa fa-check-circle"></span>I want to help!</button>	
+						{{-- $video->task->user_id --}}
+						@if ($video->task)
+						{{ $video->task->user_id }}
+						@endif
+						
+					</p>
+				</div>	
+
+				<div class="col-md-4">
+
+					<ul class="list-group no-margin">
+						<!-- Without left and right borders, extra small horizontal padding -->
+						<li class="list-group-item no-border padding-xs-hr">
+							00:15:32 <i class="fa  fa-clock-o pull-right"></i>
+						</li> <!-- / .list-group-item -->
+						<!-- Without left and right borders, extra small horizontal padding -->
+						<li class="list-group-item no-border-hr padding-xs-hr">
+							12/05/2014 <i class="fa  fa-calendar-o pull-right"></i>
+						</li> <!-- / .list-group-item -->
+						<!-- Without left and right borders, without bottom border, extra small horizontal padding -->
+						<li class="list-group-item no-border-hr no-border-b padding-xs-hr">
+							47 comments <i class="fa  fa-comment pull-right"></i>
+						</li> <!-- / .list-group-item -->
+					</ul>
+					
+				</div>	
+
+				<div class="col-md-2 text-center">
+					
+					<p><a href="{{ $video->original_link }}" target="_blank" class="btn btn-flat btn-block btn-sm btn-labeled btn-danger"><span class="btn-label icon fa fa-youtube-play"></span>Original</a></p>
+					<p><a href="{{ $video->working_link }}" target="_blank" class="btn btn-flat btn-block btn-sm btn-labeled btn-success"><span class="btn-label icon fa fa-rocket"></span>Let's go!</a></p>
+					<p><a href="{{ URL::route('videos-details', $video->id) }}" target="_blank" class="btn btn-flat btn-block btn-sm btn-labeled btn-info"><span class="btn-label icon fa  fa-info"></span>Details</a></p>
+
+				</div>
+				
+			</div>
+
 		</div>
 	</div>
+
+</div>
+
+
+@endforeach
+
+ 
+
+@stop
+
+@section('script')
+
+<script type="text/javascript">
+	init.push(function () {
+		
+		
+
+	})
+	window.PixelAdmin.start(init);
+</script>
+			
 @stop
 
 				

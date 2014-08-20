@@ -82,6 +82,8 @@ return array(
 	|
 	*/
 
+	"video_url"                  => "The url of the video is invalid.",
+
 	'custom' => array(
 		'attribute-name' => array(
 			'rule-name' => 'custom-message',
