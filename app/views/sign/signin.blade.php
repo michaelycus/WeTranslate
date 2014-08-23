@@ -101,7 +101,7 @@
 
 	<div class="signin-with">
 		<div class="header">or sign in with</div>
-		<a href="index.html" class="btn btn-lg btn-facebook rounded"><i class="fa fa-facebook"></i></a>&nbsp;&nbsp;
+		<a href="{{ URL::route('login-fb') }}" class="btn btn-lg btn-facebook rounded"><i class="fa fa-facebook"></i></a>&nbsp;&nbsp;
 		{{--<a href="index.html" class="btn btn-lg btn-info rounded"><i class="fa fa-twitter"></i></a>&nbsp;&nbsp;--}}
 		{{--<a href="index.html" class="btn btn-lg btn-danger rounded"><i class="fa fa-google-plus"></i></a>--}}
 	</div>

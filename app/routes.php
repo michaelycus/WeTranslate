@@ -65,6 +65,32 @@ Route::group(array('before' => 'auth'), function(){
 		'uses' => 'VideoController@getTranslating'
 	));
 
+
+	Route::get('/videos/teste', array(
+		'as' => 'videos-teste',
+		'uses' => 'VideoController@getTeste'
+	));
+
+
+
+	Route::get('/videos/tasks/{video_id}/{status}', array(
+		'as' => 'videos-tasks',
+		'uses' => 'VideoController@getTasks'
+	));
+
+	Route::get('/videos/help/{id}/{status}', array(
+		'as' => 'videos-help',
+		'uses' => 'VideoController@getHelp'
+	));
+
+	Route::get('/videos/stophelp/{id}/{status}', array(
+		'as' => 'videos-stop-help',
+		'uses' => 'VideoController@getStopHelp'
+	));
+
+
+
+
 	Route::get('/videos/synchronizing', array(
 		'as' => 'videos-synchronizing',
 		'uses' => 'VideoController@getSynchronizing'
@@ -138,7 +164,6 @@ Route::group(array('before' => 'auth'), function(){
 	    return 'Users! '. $matches[0];
 	});
 
-
 });
 
 /*
@@ -187,6 +212,52 @@ Route::group(array('before' => 'guest'), function(){
 		'as' => 'account-activate',
 		'uses' => 'HomeController@getActivate'
 	));		
+
+	Route::get('login/fb', array('as' => 'login-fb', function() {
+	    $facebook = new Facebook(Config::get('facebook'));
+	    $params = array(
+	        'redirect_uri' => url('/login/fb/callback'),
+	        'scope' => 'email',
+	    );
+	    return Redirect::to($facebook->getLoginUrl($params));
+	}));
+
+	Route::get('login/fb/callback', array('as' => 'login-fb-callback', function() {
+	    $code = Input::get('code');
+	    if (strlen($code) == 0) return Redirect::to('/')->with('message', 'There was an error communicating with Facebook');
+
+	    $facebook = new Facebook(Config::get('facebook'));
+	    $uid = $facebook->getUser();
+
+	    if ($uid == 0) return Redirect::to('/')->with('message', 'There was an error');
+
+	    $me = $facebook->api('/me');
+
+	    $profile = Profile::whereUid($uid)->first();
+	    if (empty($profile)) {
+	        $user = new User;
+	        $user->name = $me['first_name'];
+	        $user->fullname = $me['first_name'].' '.$me['last_name'];
+	        $user->email = $me['email'];
+	        $user->photo = 'https://graph.facebook.com/'.$me['id'].'/picture?type=large';
+
+	        $user->save();
+
+	        $profile = new Profile();
+	        $profile->uid = $uid;
+	        $profile->username = $me['id'];
+	        $profile = $user->profiles()->save($profile);
+	    }
+
+	    $profile->access_token = $facebook->getAccessToken();
+	    $profile->save();
+
+	    $user = $profile->user;
+
+	    Auth::login($user);
+
+	    return Redirect::to('/')->with('message', 'Logged in with Facebook');
+	}));
 
 });
 

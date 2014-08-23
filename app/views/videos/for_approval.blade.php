@@ -22,7 +22,7 @@
 					<td>{{ $video->original_link }}</td>
 					<td>{{ $video->working_link }}</td>					
 					<td>
-						<a href="{{ URL::route('videos-verify', $video->id ) }}" class="btn btn-flat btn-sm btn-labeled btn-warning"><span class="btn-label icon fa fa-search"></span>Verify</a>						
+						<a href="{{ URL::route('videos-verify', $video->id) }}" class="btn btn-flat btn-sm btn-labeled btn-warning"><span class="btn-label icon fa fa-search"></span>Verify</a>						
 					</td>
 				</tr>
 				@endforeach							

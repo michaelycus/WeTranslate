@@ -60,10 +60,9 @@
 						<ul class="nav navbar-nav pull-right right-navbar-nav">
 <!-- /3. $END_NAVBAR_ICON_BUTTONS -->
 
-
 							<li class="dropdown">
 								<a href="#" class="dropdown-toggle user-menu" data-toggle="dropdown">
-									<img src="{{ URL::asset('assets/demo/avatars/1.jpg') }}" alt="">
+									<img src="{{ Auth::user()->photo; }}" alt="">
 									<span>{{ Auth::user()->name }}</span>
 								</a>
 								<ul class="dropdown-menu"> 
@@ -91,9 +90,9 @@
 					 Javascript: html/assets/demo/demo.js
 				 -->
 				<div>
-					<div class="text-bg"><span class="text-slim">Welcome,</span> <span class="text-semibold">{{ Auth::user()->name; }}</span></div>
+					<div class="text-bg"><span class="text-slim">Hello,</span> <span class="text-semibold">{{ Auth::user()->name; }}</span></div>
 
-					<img src="{{ URL::asset('assets/demo/avatars/1.jpg') }}" alt="" class="">
+					<img src="{{ Auth::user()->photo; }}" alt="" class="">
 					<div class="btn-group">						
 						<a href="#" class="btn btn-xs btn-primary btn-outline dark"><i class="fa fa-user"></i></a>
 						<a href="#" class="btn btn-xs btn-primary btn-outline dark"><i class="fa fa-cog"></i></a>
@@ -107,13 +106,13 @@
 					<!-- <a href="index.html"><i class="menu-icon fa fa-dashboard"></i><span class="mm-text">Dashboard</span></a> -->
 				</li>
 				<li>
-					<a href="{{ URL::route('videos-translating') }}"><i class="menu-icon fa fa-clipboard"></i><span class="mm-text">Translating</span></a>
+					<a href="{{ URL::route('videos-translating') }}"><i class="menu-icon fa fa-text-width"></i><span class="mm-text">Translating</span></a>
 				</li>
 				<li>
 					<a href="{{ URL::route('videos-synchronizing') }}"><i class="menu-icon fa fa-clock-o"></i><span class="mm-text">Synchronizing</span></a>
 				</li>
 				<li>
-					<a href="{{ URL::route('videos-proofreading') }}"><i class="menu-icon fa fa-search-plus"></i><span class="mm-text">Proofreading</span></a>
+					<a href="{{ URL::route('videos-proofreading') }}"><i class="menu-icon fa fa-eye"></i><span class="mm-text">Proofreading</span></a>
 				</li>	
 				<li>
 					<a href="{{ URL::route('videos-finished') }}"><i class="menu-icon fa fa-check"></i><span class="mm-text">Finished</span></a>
@@ -124,7 +123,7 @@
 				
 			</ul> <!-- / .navigation -->
 			<div class="menu-content">
-				<a href="{{ URL::route('videos-suggest') }}" class="btn btn-primary btn-block btn-outline dark">Suggest video</a>
+				<a href="{{ URL::route('videos-suggest') }}" class="btn btn-primary btn-block btn-outline dark"><i class="menu-icon fa fa-star"></i> Suggest video</a>
 			</div>
 		</div> <!-- / #main-menu-inner -->
 	</div> <!-- / #main-menu -->
