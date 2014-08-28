@@ -116,10 +116,13 @@
 				</li>	
 				<li>
 					<a href="{{ URL::route('videos-finished') }}"><i class="menu-icon fa fa-check"></i><span class="mm-text">Finished</span></a>
-				</li>				
-				<li>
-					<a href="{{ URL::route('videos-for-approval') }}"><i class="menu-icon fa fa-legal"></i><span class="mm-text">For Approval</span></a>
+				</li>	
+
+				@if (Auth::user()->auth >= USER_AUTH_ADMIN)
+				<li>					
+					<a href="{{ URL::route('videos-for-approval') }}"><i class="menu-icon fa fa-legal"></i><span class="mm-text">For Approval </span><span class="label label-warning">{{ Video::forApproval() }}</span></a>
 				</li>		
+				@endif
 				
 			</ul> <!-- / .navigation -->
 			<div class="menu-content">

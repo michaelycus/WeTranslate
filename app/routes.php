@@ -78,6 +78,11 @@ Route::group(array('before' => 'auth'), function(){
 		'uses' => 'VideoController@getTasks'
 	));
 
+	Route::get('/videos/detail-tasks/{video_id}/{status}', array(
+		'as' => 'videos-detail-tasks',
+		'uses' => 'VideoController@getDetailTasks'
+	));
+
 	Route::get('/videos/help/{id}/{status}', array(
 		'as' => 'videos-help',
 		'uses' => 'VideoController@getHelp'
@@ -141,6 +146,18 @@ Route::group(array('before' => 'auth'), function(){
 		'uses' => 'VideoController@getDetails'
 	));
 
+	Route::get('/videos/move-to/{id}/{status}', array(
+		'as' => 'videos-move-to',
+		'uses' => 'VideoController@getMoveTo'
+	));
+
+	Route::get('/videos/return-to/{id}/{status}', array(
+		'as' => 'videos-return-to',
+		'uses' => 'VideoController@getReturnTo'
+	));
+
+
+
 	/*
 	| USERS
 	*/
@@ -153,18 +170,116 @@ Route::group(array('before' => 'auth'), function(){
 	| TESTE
 	*/
 	Route::get('/teste', function()
-	{
-		$link = "https://www.youtube.com/watch?v=ifEOoEpMBxg";
-		preg_match("#(?<=v=)[a-zA-Z0-9-]+(?=&)|(?<=v\/)[^&\n]+(?=\?)|(?<=v=)[^&\n]+|(?<=youtu.be/)[^&\n]+#", $link, $matches);
+	{		
+		$ch = curl_init();
 
-		$json = json_decode(file_get_contents("http://gdata.youtube.com/feeds/api/videos/$matches[0]?v=2&alt=jsonc"));
-    	echo '<img src="' . $json->data->thumbnail->sqDefault . '">';
-    	echo ' '. $json->data->title . ' ';
+		curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+		    'X-api-username: Michael39',
+		    'X-apikey: dcdda23f59b8d2cec74f4f29d18d03c403dbcf4b'
+	    ));
 
-	    return 'Users! '. $matches[0];
+		curl_setopt($ch, CURLOPT_URL, "https://www.universalsubtitles.org/api2/partners/videos/iv6T7WyO5Ujo/");
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+		curl_setopt($ch, CURLOPT_HEADER, 0);
+		curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+
+		 curl_setopt($ch, CURLOPT_VERBOSE, 1);
+
+		$curl_response = curl_exec($ch);
+
+		$info = curl_getinfo($ch);
+ 
+		echo 'Took ' . $info['total_time'] . ' seconds for url ' . $info['url'];
+		echo '<br/><br/><br/>';
+
+		var_dump($info);
+		echo '<br/><br/><br/>';
+
+		var_dump($_SERVER);
+		echo '<br/><br/><br/>';
+
+		if ($curl_response === FALSE) { 
+		    echo "cURL Error: " . curl_error($ch);		 
+		}else
+		{
+			echo 'feito... <br/>';
+			echo (format_json($curl_response, true));
+		}
+
+		curl_close($ch);
+	});
+
+	Route::get('/teste2', function()
+	{		
+		$ch = curl_init();
+
+		curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+		    'X-api-username: Michael39',
+		    'X-apikey: dcdda23f59b8d2cec74f4f29d18d03c403dbcf4b'
+	    ));
+
+		curl_setopt($ch, CURLOPT_URL, "https://www.universalsubtitles.org/api2/partners/videos/iv6T7WyO5Ujo/");
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);		
+		curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);		 
+
+		$curl_response = curl_exec($ch);		
+
+		if ($curl_response === FALSE) { 
+		    echo "cURL Error: " . curl_error($ch);		 
+		}else
+		{			
+			echo (format_json($curl_response, true));
+		}
+
+		curl_setopt($ch, CURLOPT_URL, "https://www.universalsubtitles.org/api2/partners/videos/eRXNBZ2M059G/");
+
+		$curl_response = curl_exec($ch);		
+
+		echo (format_json($curl_response, true));
+
+		curl_close($ch);
+	});
+
+	Route::get('/createamara', function()
+	{		
+		$ch = curl_init();
+
+		curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+		    'X-api-username: Michael39',
+		    'X-apikey: dcdda23f59b8d2cec74f4f29d18d03c403dbcf4b',
+		    'Accept: application/json'
+	    ));
+
+		curl_setopt($ch, CURLOPT_URL, "https://www.amara.org/api2/partners/videos/");
+
+		$data = array('video_url' => 'http://vimeo.com/10778141');
+		// $data = array('video_url' => 'https://www.youtube.com/watch?v=DK61hj7F-O8', 'primary_audio_language_code ' => 'pt-br');
+		curl_setopt($ch, CURLOPT_POST, 1);
+		curl_setopt($ch, CURLOPT_POSTFIELDS,$data);
+
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);		
+		curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);		 
+
+
+		$info = curl_getinfo($ch);
+		var_dump($info);
+
+		$curl_response = curl_exec($ch);		
+
+		if ($curl_response === FALSE) { 
+		    echo "cURL Error: " . curl_error($ch);		 
+		}else
+		{			
+			echo (format_json($curl_response, true));
+		}
+
+		curl_close($ch);
 	});
 
 });
+
+
+
 
 /*
 | Unauthenticated group

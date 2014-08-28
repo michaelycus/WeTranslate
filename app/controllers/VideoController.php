@@ -13,8 +13,8 @@ class VideoController extends BaseController {
 
 		}
 
-		 return View::make('videos.status', array('videos' => $videos,
-		 									      'status' => VIDEO_STATUS_TRANSLATING));
+		return View::make('videos.status', array('videos' => $videos,
+		   								         'status' => VIDEO_STATUS_TRANSLATING));
 	}
 
 	public function getSynchronizing()
@@ -22,7 +22,7 @@ class VideoController extends BaseController {
 		$videos = Video::where('status', '=', VIDEO_STATUS_SYNCHRONIZING)->get();
 
 		return View::make('videos.status', array('videos' => $videos,
-		 									      'status' => VIDEO_STATUS_SYNCHRONIZING));
+		 									     'status' => VIDEO_STATUS_SYNCHRONIZING));
 	}
 
 	public function getProofreading()
@@ -30,7 +30,7 @@ class VideoController extends BaseController {
 		$videos = Video::where('status', '=', VIDEO_STATUS_PROOFREADING)->get();
 
 		return View::make('videos.status', array('videos' => $videos,
-		 									      'status' => VIDEO_STATUS_PROOFREADING));
+		 									     'status' => VIDEO_STATUS_PROOFREADING));
 	}
 
 	public function getFinished()
@@ -38,7 +38,7 @@ class VideoController extends BaseController {
 		$videos = Video::where('status', '=', VIDEO_STATUS_FINISHED)->get();
 
 		return View::make('videos.status', array('videos' => $videos,
-		 									      'status' => VIDEO_STATUS_FINISHED));
+		 									     'status' => VIDEO_STATUS_FINISHED));
 	}
 
 	public function getForApproval()
@@ -46,7 +46,7 @@ class VideoController extends BaseController {
 		$videos = Video::where('status', '=', VIDEO_FOR_APPROVAL)->get();
 
 		return View::make('videos.for_approval', array('videos' => $videos,
-		 									      'status' => VIDEO_FOR_APPROVAL));
+		 									           'status' => VIDEO_FOR_APPROVAL));
 	}	
 
 	public function getVerify($id)
@@ -54,6 +54,15 @@ class VideoController extends BaseController {
 		$video = Video::find($id);
 
 		return View::make('videos.verify', array('video' => $video));
+	}
+
+	public function getDetails($id)
+	{
+		$video = Video::find($id);
+		$tasks = Task::where('video_id', '=', $id)->get();
+
+		return View::make('videos.details', array('video' => $video,
+												  'tasks' => $tasks));
 	}
 
 	public function postVerify($id)
@@ -144,13 +153,7 @@ class VideoController extends BaseController {
 			}
 		}
 	}
-
-	public function getDetails($id)
-	{
-		$video = Video::find($id);
-
-		return View::make('videos.details', array('video' => $video));
-	}
+	
 
 	public function getTasks($video_id, $status)
 	{
@@ -167,7 +170,7 @@ class VideoController extends BaseController {
 				$user_task[$task->user_id][] = $task->type;
 			}
 
-			$text = '<p>';
+			$text = '<div class="text-center">';
 
 			$is_helping = FALSE;
 
@@ -178,14 +181,14 @@ class VideoController extends BaseController {
 
 				foreach ($type as $t) {
 					if ($t != TASK_APPROVED_VIDEO) // Don't need to present approved icon
-						$text .= ' <i class="'. $icons[$t] . ' text-primary"></i> ';
+						$text .= ' <i class="menu-icon fa '. $icons[$t] . ' text-primary"></i> ';
 
 					if ($currentUser == $user_id && $t == $status) // current is participating of the task
 						$is_helping = TRUE;
 				}
 			}
 
-			$text .= '</p>';
+			$text .= '</div><br/>';
 
 			if ($is_helping)
 			{
@@ -194,6 +197,60 @@ class VideoController extends BaseController {
 			else
 			{
 				$text .= '<button class="btn btn-flat btn-sm btn-labeled btn-success" onclick="setHelp('.$video_id.','.$status.')"><span class="btn-label icon fa fa-check-circle"></span>I want to help!</button>';	
+			}
+
+			return $text;
+		}		
+	}
+
+	public function getDetailTasks($video_id, $status)
+	{
+		if (Request::ajax())
+		{
+		    $tasks = Task::where('video_id', '=', $video_id)->orderBy('id')->get();
+
+			$icons = unserialize (IMG_VIDEO_STATUS);
+
+			$currentUser = Auth::id();
+
+			$user_task = array();
+			foreach ($tasks as $task) {
+				$user_task[$task->user_id][] = $task->type;
+			}
+
+			$is_helping = FALSE;
+
+			$text = '<div class="list-group">';
+
+			foreach ($user_task as $user_id => $type) {
+				$user = User::find($user_id);
+
+				$text .= '<a href="#" class="list-group-item">';
+
+				$text .= '<img src="'. $user->photo.'" alt="" class="user-list"> ';
+				$text .= $user->name;
+
+				$text .= ' [ ';
+				foreach ($type as $t) {
+					if ($t != TASK_APPROVED_VIDEO) // Don't need to present approved icon
+						$text .= ' <i class="menu-icon fa '. $icons[$t] . ' text-primary"></i> ';
+
+					if ($currentUser == $user_id && $t == $status) // current is participating of the task
+						$is_helping = TRUE;
+				}
+
+				$text .= ' ]</a>';
+			}
+
+			$text .= '</div>';
+
+			if ($is_helping)
+			{
+				$text .= '<div class="text-center"><button class="btn btn-flat btn-sm btn-labeled btn-danger" onclick="setStopHelp('.$video_id.','.$status.')"><span class="btn-label icon fa fa-times-circle"></span>Stop helping!</button></div>';
+			}
+			else
+			{
+				$text .= '<div class="text-center"><button class="btn btn-flat btn-sm btn-labeled btn-success" onclick="setHelp('.$video_id.','.$status.')"><span class="btn-label icon fa fa-check-circle"></span>I want to help!</button></div>';	
 			}
 
 			return $text;
@@ -220,6 +277,50 @@ class VideoController extends BaseController {
 
 			$task->delete();
 		}
+	}
+
+	public function getMoveTo($video_id, $status)
+	{
+		$video = Video::find($video_id);
+		$video->status = $status;
+		$video->save();
+
+		switch ($status) {
+			case VIDEO_STATUS_SYNCHRONIZING:
+				$status = TASK_ADVANCE_TO_SYNC; break;
+			case VIDEO_STATUS_PROOFREADING:
+				$status = TASK_ADVANCE_TO_PROOF; break;
+			case VIDEO_STATUS_FINISHED:
+				$status = TASK_FINISHED_VIDEO; break;
+		}
+
+		Task::create(array(
+			'type' => $status,
+			'user_id' => Auth::id(),
+			'video_id' => $video_id
+		));
+	}
+
+	public function getReturnTo($video_id, $status)
+	{
+		$video = Video::find($video_id);
+		$video->status = $status;
+		$video->save();
+
+		switch ($status) {
+			case TASK_IS_TRANSLATING:
+				$status = TASK_BACK_TO_TRANS; break;
+			case TASK_IS_SYNCHRONIZING:
+				$status = TASK_BACK_TO_SYNC; break;
+			case TASK_IS_PROOFREADING:
+				$status = TASK_BACK_TO_PROOF; break;
+		}
+
+		Task::create(array(
+			'type' => $status,
+			'user_id' => Auth::id(),
+			'video_id' => $video_id
+		));
 	}
 
 	public function getTeste()

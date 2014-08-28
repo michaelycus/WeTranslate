@@ -4,6 +4,7 @@
 
 @section('content')
 
+
 <?php	
 	preg_match("#(?<=v=)[a-zA-Z0-9-]+(?=&)|(?<=v\/)[^&\n]+(?=\?)|(?<=v=)[^&\n]+|(?<=youtu.be/)[^&\n]+#",  $video->original_link, $matches);
 
@@ -16,23 +17,24 @@
 	<div class="profile-row">
 	<div class="left-col">
 		<div class="profile-block">
-			<div class="panel profile-photo">
-				{{ '<img src="' . $json->data->thumbnail->hqDefault . '">' }}
+			<div class="panel video-detail-image">
+				{{ '<img src="' . $json->data->thumbnail->sqDefault . '">' }}
 			</div><br>
-
-			<a href="#" class="btn btn-flat btn-labeled btn-success"><span class="btn-label icon fa fa-check-circle"></span>I want to help!</a>			
 			
 		</div>
 
 		<div class="panel panel-transparent">
 			<div class="panel-heading">
-				<span class="panel-title">Who is working</span>
+				<span class="panel-title"></span>
 			</div>
-			<div class="list-group">
+
+			<div class="tasks-panel">
+			</div>
+			<!-- <div class="list-group">
 				<a href="#" class="list-group-item"><img src="{{ URL::asset('assets/demo/avatars/1.jpg') }}" alt="" class="user-list"> Michael</a>
 				<a href="#" class="list-group-item"><img src="{{ URL::asset('assets/demo/avatars/3.jpg') }}" alt="" class="user-list"> Fulana</a>
 				<a href="#" class="list-group-item"><img src="{{ URL::asset('assets/demo/avatars/4.jpg') }}" alt="" class="user-list"> Siclano</a>
-			</div>
+			</div> -->
 		</div>
 
 		<div class="panel panel-transparent">
@@ -40,10 +42,10 @@
 				<span class="panel-title">Details</span>
 			</div>
 			<div class="list-group">
-				<a href="#" class="list-group-item"><i class="profile-list-icon fa fa-youtube-play" style="color: #e00022"></i> Original location</a>
-				<a href="#" class="list-group-item"><i class="profile-list-icon fa fa-rocket" style="color: #059418"></i> Working location</a>
-				<a href="#" class="list-group-item"><i class="profile-list-icon fa fa-clock-o" style="color: #4ab6d5"></i> 00:15:26</a>
-				<a href="#" class="list-group-item"><i class="profile-list-icon fa fa-calendar-o" style="color: #1a7ab9"></i> 02/06/2014</a>
+				<a href="{{ $video->original_link }}" class="list-group-item"><i class="profile-list-icon fa fa-youtube-play" style="color: #e00022"></i> Original location</a>
+				<a href="{{ $video->working_link }}" class="list-group-item"><i class="profile-list-icon fa fa-rocket" style="color: #059418"></i> Working location</a>
+				<a href="#" class="list-group-item"><i class="profile-list-icon fa fa-clock-o" style="color: #4ab6d5"></i> {{ gmdate("H:i:s", $json->data->duration) }}</a>
+				<a href="#" class="list-group-item"><i class="profile-list-icon fa fa-calendar-o" style="color: #1a7ab9"></i> {{ date("d/m/Y", strtotime($video->created_at)) }}</a>
 			</div>
 		</div>
 
@@ -67,7 +69,7 @@
 				<div class="widget-article-comments tab-pane panel no-padding no-border fade in active" id="profile-tabs-board">
 
 					<div class="comment">
-						<img src="{{ URL::asset('assets/demo/avatars/1.jpg') }}" alt="" class="comment-avatar">
+						<!-- <img src="{{ URL::asset('assets/demo/avatars/1.jpg') }}" alt="" class="comment-avatar">
 						<div class="comment-body">
 							<form action="" id="leave-comment-form" class="comment-text no-padding no-border">
 								<textarea class="form-control" rows="1"></textarea>
@@ -79,31 +81,75 @@
 									<button class="btn btn-primary pull-right">Leave Message</button>
 								</div>
 							</form>
-						</div> <!-- / .comment-body -->
+						</div> --> <!-- / .comment-body -->
+
+						<div id="disqus_thread"></div>
+						<script type="text/javascript">
+							/* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+							var disqus_shortname = 'wetranslate'; // required: replace example with your forum shortname
+
+							/* * * DON'T EDIT BELOW THIS LINE * * */
+							(function() {
+							var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+							dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+							(document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+							})();
+						</script>
+						<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+						<a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>						    
+
 					</div>
 
 					<hr class="no-panel-padding-h panel-wide">
 
-
 				</div> <!-- / .tab-pane -->
 
 				<div class="tab-pane fade" id="profile-tabs-activity">
-					<div class="timeline">
-						<!-- Timeline header -->
-						<div class="tl-header now">Now</div>
+					<div class="timeline centered">
+						<div class="tl-header now bg-primary">Now</div>
 
-						<div class="tl-entry">
+					<?php
+					$tasks_label = unserialize(TASKS_TYPE_LABEL);
+					$img_video_status = unserialize(IMG_VIDEO_STATUS);
+					$i = 1;
+					?>
+					@foreach ($tasks as $task)
+						 
+						<div class="tl-entry <?php echo ($i%2==0 ? '' : 'left'); $i++;  ?>">
 							<div class="tl-time">
-								1h ago
+								{{ date("d/m/Y", strtotime($task->created_at)) }}
 							</div>
-							<div class="tl-icon bg-warning"><i class="fa fa-envelope"></i></div>
-							<div class="panel tl-body">
-								<h4 class="text-warning">Lorem ipsum dolor sit amet</h4>
-								Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-							</div> <!-- / .tl-body -->
-						</div> <!-- / .tl-entry -->
-					
-					</div> <!-- / .timeline -->				
+
+							<?php
+							switch ($task->type) {
+								case TASK_SUGGESTED_VIDEO: $background = 'bg-info'; break;
+								case TASK_IS_TRANSLATING: 
+								case TASK_IS_SYNCHRONIZING: 
+								case TASK_IS_PROOFREADING: $background = 'bg-warning'; break;
+								case TASK_IS_FINISHED: 
+								case TASK_APPROVED_VIDEO: $background = 'bg-success'; break;
+								case TASK_REJECTED_VIDEO: $background = 'bg-danger'; break;								
+								case TASK_ADVANCE_TO_SYNC:
+								case TASK_ADVANCE_TO_PROOF: $background = 'bg-primary'; break;
+								case TASK_BACK_TO_TRANS:
+								case TASK_BACK_TO_SYNC: 								
+								case TASK_BACK_TO_PROOF: $background = 'bg-default'; break;									
+							}
+							?>
+
+							<div class="tl-icon {{ $background }}" style="padding-top: 12px">
+								<i class="fa {{ $img_video_status[$task->type] }}"></i>
+							</div>
+
+							<div class="panel tl-body">			
+							    <img src="{{ $task->user->photo }}" alt="" class="rounded" style=" width: 20px;height: 20px;margin-top: -2px;">					
+								{{ $task->user->name . ' ' . $tasks_label[$task->type] }}
+							</div>
+						</div>
+
+					@endforeach
+
+					</div>		
 				
 				</div> <!-- / .tab-pane -->
 			</div> <!-- / .tab-content -->
@@ -130,6 +176,46 @@
 		});
 	})
 	window.PixelAdmin.start(init);
+
+	function refresh_videos()
+	{
+		$('div.tasks-panel').empty();
+
+		$('div.tasks-panel').each(function(index, value){		    		    
+		    var url = '<?php echo URL::to('/'); ?>' + '/videos/detail-tasks/{{ $video->id }}/{{$video->status}}';
+			var div = $(this);
+
+		    $.get(url, function(data) {
+	           div.append(data);
+	        });
+		});
+	}
+
+	function setHelp(video_id, status)
+	{		
+		var url = '<?php echo URL::to('/'); ?>' + '/videos/help/' + video_id + '/' + status;
+		$.get(url, function(data) {
+           refresh_videos();
+	    });			
+	}
+
+	function setStopHelp(video_id, status)
+	{		
+		var url = '<?php echo URL::to('/'); ?>' + '/videos/stophelp/' + video_id + '/' + status;
+		$.get(url, function(data) {
+           refresh_videos();
+	    });			
+	}
+
+	refresh_videos();
+
+	$('.timeline').each(function(index, value){
+	    $(this).removeClass('page-profile');
+	});
+
+	
+
+
 </script>
 			
 @stop

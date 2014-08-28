@@ -10,3 +10,15 @@ img.user-list  {
 	height: 100%;
 	background: green;
 }
+
+.video-detail-image {
+  padding: 6px;
+  display: inline-block;
+  margin-bottom: 5px;
+  border-radius: 10px;
+}
+.video-detail-image img {
+  display: block;
+  max-width: 100%;
+  border-radius: 5px;
+}

@@ -26,8 +26,7 @@ class AccountController extends BaseController{
 
 			$auth = Auth::attempt(array(
 				'email' => Input::get('email'),
-				'password' => Input::get('password'),
-				'auth' => 1
+				'password' => Input::get('password'),				
 			), $remember);
 
 			if ($auth){
@@ -83,7 +82,7 @@ class AccountController extends BaseController{
 				'name' 		=> $name,
 				'password' 	=> Hash::make($password),
 				'code' 		=> $code,
-				'auth' 		=> 0
+				'auth' 		=> USER_NOT_AUTHORIZED
 			));
 
 			if ($user){
@@ -99,13 +98,13 @@ class AccountController extends BaseController{
 	}
 
 	public function getActivate($code){
-		$user = User::where('code', '=', $code)->where('auth', '=', 0);
+		$user = User::where('code', '=', $code)->where('auth', '=', USER_NOT_AUTHORIZED);
 
 		if ($user->count()){
 			$user = $user->first();
 
 			// Update user to active state	
-			$user->auth = 1;
+			$user->auth = USER_AUTH_OPERATOR;
 			$user->code = '';
 
 			if ($user->save()){
