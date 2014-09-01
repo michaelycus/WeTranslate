@@ -62,13 +62,12 @@
 
 							<li class="dropdown">
 								<a href="#" class="dropdown-toggle user-menu" data-toggle="dropdown">
-									<img src="{{ Auth::user()->photo; }}" alt="">
+									<img src="{{ Auth::user()->photo(); }}" alt="">
 									<span>{{ Auth::user()->name }}</span>
 								</a>
 								<ul class="dropdown-menu"> 
-									<li><a href="{{ URL::route('user-profile', Auth::id()) }}) }}">Profile</a></li>
-									<li><a href="#"><span class="badge badge-primary pull-right">New</span>Account</a></li>
-									<li><a href="#"><i class="dropdown-icon fa fa-cog"></i>&nbsp;&nbsp;Settings</a></li>
+									<li><a href="{{ URL::route('user-profile', Auth::id()) }}) }}">Profile</a></li>									
+									<li><a href="{{ URL::route('users-manage')}}"><i class="dropdown-icon fa fa-users"></i>&nbsp;&nbsp;Manage users</a></li>
 									<li class="divider"></li>
 									<li><a href="{{ URL::route('account-sign-out') }}"><i class="dropdown-icon fa fa-power-off"></i>&nbsp;&nbsp;Log Out</a></li>
 								</ul>
@@ -92,7 +91,7 @@
 				<div>
 					<div class="text-bg"><span class="text-slim">Hello,</span> <span class="text-semibold">{{ Auth::user()->name; }}</span></div>
 
-					<img src="{{ Auth::user()->photo; }}" alt="" class="">
+					<img src="{{ Auth::user()->photo(); }}" alt="" class="">
 					<div class="btn-group">						
 						<a href="#" class="btn btn-xs btn-primary btn-outline dark"><i class="fa fa-user"></i></a>
 						<a href="#" class="btn btn-xs btn-primary btn-outline dark"><i class="fa fa-cog"></i></a>

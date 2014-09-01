@@ -20,6 +20,7 @@ class CreateVideosTable extends Migration {
 			$table->tinyInteger('status');
 			$table->time('duration');
 			$table->timestamps();
+			$table->softDeletes();
 		});
 	}
 

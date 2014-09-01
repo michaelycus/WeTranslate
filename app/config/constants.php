@@ -1,11 +1,11 @@
 <?php
 
-define('VIDEO_FOR_APPROVAL',		  	0);
-define('VIDEO_STATUS_TRANSLATING',  	1);
-define('VIDEO_STATUS_SYNCHRONIZING',  	2);
-define('VIDEO_STATUS_PROOFREADING',  	3);
-define('VIDEO_STATUS_FINISHED',  		4);
-define('VIDEO_STATUS_REJECTED',  		5);
+define('VIDEO_FOR_APPROVAL',		  	 0);
+define('VIDEO_STATUS_TRANSLATING',   1);
+define('VIDEO_STATUS_SYNCHRONIZING', 2);
+define('VIDEO_STATUS_PROOFREADING',  3);
+define('VIDEO_STATUS_FINISHED',  		 4);
+define('VIDEO_STATUS_REJECTED',  		 5);
 
 define('VIDEO_STATUS_LABEL', serialize(array('Need to be approved',
 										     'Open for translations', 
@@ -16,7 +16,7 @@ define('VIDEO_STATUS_LABEL', serialize(array('Need to be approved',
 
 define('USER_NOT_AUTHORIZED',  	0);
 define('USER_AUTH_OPERATOR',  	1);
-define('USER_AUTH_ADMIN',  		2);
+define('USER_AUTH_ADMIN',  		  2);
 define('USER_AUTH_OWNER',       3);
 
 define('TASK_SUGGESTED_VIDEO', 	0); // VIDEO_FOR_APPROVAL
@@ -64,6 +64,48 @@ define('IMG_VIDEO_STATUS', serialize(array('fa-star',
                                            'fa-arrow-left',
                                            'fa-arrow-left',
                                            'fa-arrow-left')));
+
+define('USER_SCORE_TRANSLATED',   0);
+define('USER_SCORE_SYNCHRONIZED', 1);
+define('USER_SCORE_PROOFREADED',  2);
+define('USER_SCORE_SUGGESTED',    3);
+define('USER_SCORE_OPENED',       4);
+define('USER_SCORE_WORKED_IN',    5);
+define('USER_SCORE_TOTAL',        6);
+
+define('SCORE_TRANSLATED',        30);
+define('SCORE_SYNCHRONIZED',      20);
+define('SCORE_PROOFREADED',       15);
+
+function time_elapsed_string($datetime, $full = false) 
+{
+    $now = new DateTime;
+    $ago = new DateTime($datetime);
+    $diff = $now->diff($ago);
+
+    $diff->w = floor($diff->d / 7);
+    $diff->d -= $diff->w * 7;
+
+    $string = array(
+        'y' => 'year',
+        'm' => 'month',
+        'w' => 'week',
+        'd' => 'day',
+        'h' => 'hour',
+        'i' => 'minute',
+        's' => 'second',
+    );
+    foreach ($string as $k => &$v) {
+        if ($diff->$k) {
+            $v = $diff->$k . ' ' . $v . ($diff->$k > 1 ? 's' : '');
+        } else {
+            unset($string[$k]);
+        }
+    }
+
+    if (!$full) $string = array_slice($string, 0, 1);
+    return $string ? implode(', ', $string) . ' ago' : 'just now';
+}
 
 function format_json($json, $html = false, $tabspaces = null)
 {

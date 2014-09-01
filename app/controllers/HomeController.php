@@ -21,10 +21,30 @@ class HomeController extends BaseController {
 		// 	$message->to('michaelycus@gmail.com', 'Michael')->subject('Test email');
 		// });
 
-		if (Auth::check()){
-			return View::make('dashboard');
+		if (Auth::check())
+		{
+			$data = array(
+			    'count_videos_trans'   => Video::where('status', '=', VIDEO_STATUS_TRANSLATING)->count(),
+			    'count_videos_synch'   => Video::where('status', '=', VIDEO_STATUS_SYNCHRONIZING)->count(),
+			    'count_videos_proof'   => Video::where('status', '=', VIDEO_STATUS_PROOFREADING)->count(),
+			    'count_videos_finish'  => Video::where('status', '=', VIDEO_STATUS_FINISHED)->count(),
+
+			    'count_users'		   => User::where('auth', '!=', USER_NOT_AUTHORIZED)->count(),
+			    'count_user_trans'     => Auth::user()->translated_videos(),
+			    'count_user_synch'     => Auth::user()->sinchronized_videos(),
+			    'count_user_proof'     => Auth::user()->proofreaded_videos(),
+			    'count_user_worked'    => Auth::user()->worked_in_videos(),
+			    'count_user_score'     => Auth::user()->score_total(),
+
+			    'last_videos'		   => Video::orderBy('id', 'desc')->take(10)->get(),
+			    'last_tasks'		   => Task::orderBy('id', 'desc')->take(10)->get(),
+			    'last_users'		   => Task::orderBy('id', 'desc')->take(10)->get(),
+			);
+
+			return View::make('dashboard')->with($data);
 		}
-		else{
+		else
+		{
 			return View::make('sign.signin');
 		}
 

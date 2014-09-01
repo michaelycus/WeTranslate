@@ -21,7 +21,13 @@
 					<span class="panel-title">About me</span>
 				</div>
 				<div class="panel-body">
-					Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et <a href="#">dolore magna</a> aliqua.
+					<p>Videos traduzidos: {{ $user->translated_videos() }}</p>
+					<p>Videos sincronizados: {{ $user->sinchronized_videos() }}</p>
+					<p>Videos revisados: {{ $user->proofreaded_videos() }}</p>
+					<p>Videos sugeridos: {{ $user->suggested_videos() }}</p>
+					<p>Videos abertos: {{ $user->opened_videos() }}</p>
+					<p>Videos trabalhados: {{ $user->worked_in_videos() }}</p>
+					<p>Total de pontos: {{ $user->score_total() }}</p>
 				</div>
 			</div>
 

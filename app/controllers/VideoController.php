@@ -37,8 +37,8 @@ class VideoController extends BaseController {
 	{
 		$videos = Video::where('status', '=', VIDEO_STATUS_FINISHED)->get();
 
-		return View::make('videos.status', array('videos' => $videos,
-		 									     'status' => VIDEO_STATUS_FINISHED));
+		return View::make('videos.finished', array('videos' => $videos,
+		 									       'status' => VIDEO_STATUS_FINISHED));
 	}
 
 	public function getForApproval()
@@ -59,7 +59,7 @@ class VideoController extends BaseController {
 	public function getDetails($id)
 	{
 		$video = Video::find($id);
-		$tasks = Task::where('video_id', '=', $id)->get();
+		$tasks = Task::where('video_id', '=', $id)->orderBy('id', 'desc')->get();
 
 		return View::make('videos.details', array('video' => $video,
 												  'tasks' => $tasks));
@@ -177,10 +177,10 @@ class VideoController extends BaseController {
 			foreach ($user_task as $user_id => $type) {
 				$user = User::find($user_id);
 
-				$text .= '<img src="'. $user->photo.'" alt="" class="user-list">';
+				$text .= '<img src="'. $user->photo().'" alt="" class="user-list">';
 
 				foreach ($type as $t) {
-					if ($t != TASK_APPROVED_VIDEO) // Don't need to present approved icon
+					if ($t < TASK_REJECTED_VIDEO) // Don't need to present approved icon
 						$text .= ' <i class="menu-icon fa '. $icons[$t] . ' text-primary"></i> ';
 
 					if ($currentUser == $user_id && $t == $status) // current is participating of the task
@@ -227,7 +227,7 @@ class VideoController extends BaseController {
 
 				$text .= '<a href="#" class="list-group-item">';
 
-				$text .= '<img src="'. $user->photo.'" alt="" class="user-list"> ';
+				$text .= '<img src="'. $user->photo().'" alt="" class="user-list"> ';
 				$text .= $user->name;
 
 				$text .= ' [ ';
@@ -291,6 +291,7 @@ class VideoController extends BaseController {
 			case VIDEO_STATUS_PROOFREADING:
 				$status = TASK_ADVANCE_TO_PROOF; break;
 			case VIDEO_STATUS_FINISHED:
+				$this->addScore($video_id);
 				$status = TASK_FINISHED_VIDEO; break;
 		}
 
@@ -321,6 +322,94 @@ class VideoController extends BaseController {
 			'user_id' => Auth::id(),
 			'video_id' => $video_id
 		));
+	}
+
+	public function getRemove($video_id)
+	{
+		if (Request::ajax())
+		{
+			$video = Video::find($video_id);
+
+			$video->delete();
+		}
+	}
+
+	private function addScore($video_id)
+	{
+		// get tasks of the video
+		$tasks = Task::where('video_id', '=', $video_id)->orderBy('id')->get();
+
+		$user_task = array();
+		foreach ($tasks as $task) {
+			$user_task[$task->user_id][] = $task->type;
+		}
+
+		// count number of users in each task
+		$translating_task 	= 0;
+		$synchronizing_task = 0;
+		$proofreading_task 	= 0;
+		foreach ($user_task as $user_id => $type) {			
+			foreach ($type as $t) {				
+				if ($t == TASK_IS_TRANSLATING)
+					$translating_task++;
+				elseif ($t == TASK_IS_SYNCHRONIZING)
+					$synchronizing_task++;
+				elseif ($t == TASK_IS_PROOFREADING)
+					$proofreading_task++;
+			}
+		}
+
+		// get video info
+		$video = Video::find($video_id);
+
+		preg_match("#(?<=v=)[a-zA-Z0-9-]+(?=&)|(?<=v\/)[^&\n]+(?=\?)|(?<=v=)[^&\n]+|(?<=youtu.be/)[^&\n]+#",  $video->original_link, $matches);
+
+		$json = json_decode(file_get_contents("http://gdata.youtube.com/feeds/api/videos/$matches[0]?v=2&alt=jsonc"));
+
+		$duration_points = $json->data->duration / 60;
+
+		// setting score to the user
+		foreach ($user_task as $user_id => $type) {
+			$user = User::find($user_id);
+
+			$translated_videos 		= $user->translated_videos();
+			$sinchronized_videos 	= $user->sinchronized_videos();
+			$proofreaded_videos 	= $user->proofreaded_videos();
+			$suggested_videos 		= $user->suggested_videos();
+			$opened_videos 			= $user->opened_videos();
+			$worked_in_videos 		= $user->worked_in_videos();
+			$score_total 			= $user->score_total();
+			
+			foreach ($type as $t) {				
+				if ($t == TASK_SUGGESTED_VIDEO)
+				{					
+					$suggested_videos++;
+					$opened_videos--;
+				}	
+				elseif ($t == TASK_IS_TRANSLATING)
+				{
+					$score_total += round($duration_points * SCORE_TRANSLATED / $translating_task);
+					$translated_videos++;
+				}					
+				elseif ($t == TASK_IS_SYNCHRONIZING)
+				{
+					$score_total += round($duration_points * SCORE_SYNCHRONIZED / $synchronizing_task);
+					$sinchronized_videos++;
+				}					
+				elseif ($t == TASK_IS_PROOFREADING)
+				{
+					$score_total += round($duration_points * SCORE_PROOFREADED / $proofreading_task);
+					$proofreaded_videos++;
+				}				
+			}
+
+			$worked_in_videos++;
+
+			$user->score = $translated_videos .','. $sinchronized_videos .','. $proofreaded_videos .','. 
+			   			   $suggested_videos .','. $opened_videos .','. $worked_in_videos .','. $score_total;
+			
+			$user->save();
+		}
 	}
 
 	public function getTeste()

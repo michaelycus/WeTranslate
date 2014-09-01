@@ -58,6 +58,14 @@ Route::group(array('before' => 'auth'), function(){
 	));
 
 	/*
+	| USERS (GET)
+	*/
+	Route::get('/users/manage', array(
+		'as' => 'users-manage',
+		'uses' => 'UserController@getUsers'
+	));
+
+	/*
 	| VIDEOS
 	*/
 	Route::get('/videos/translating', array(
@@ -91,6 +99,11 @@ Route::group(array('before' => 'auth'), function(){
 	Route::get('/videos/stophelp/{id}/{status}', array(
 		'as' => 'videos-stop-help',
 		'uses' => 'VideoController@getStopHelp'
+	));
+
+	Route::get('/videos/remove/{id}', array(
+		'as' => 'videos-remove',
+		'uses' => 'VideoController@getRemove'
 	));
 
 

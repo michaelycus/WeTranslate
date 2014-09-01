@@ -7,7 +7,6 @@
 	<h1><span class="text-light-gray">Videos / </span>{{ $status_label[$status] }}</h1>
 </div> <!-- / .page-header -->
 
-
 @foreach ($videos as $video)
 <?php
 	preg_match("#(?<=v=)[a-zA-Z0-9-]+(?=&)|(?<=v\/)[^&\n]+(?=\?)|(?<=v=)[^&\n]+|(?<=youtu.be/)[^&\n]+#",  $video->original_link, $matches);
@@ -25,11 +24,20 @@
 				<div class="panel-heading-controls">
 					<!-- <span class="label label-tag label-warning">Need proofreading</span> -->
 					<div class="btn-group btn-group-xs">
-						<button class="btn dropdown-toggle" type="button" data-toggle="dropdown"><span class="fa fa-bullhorn"></span>&nbsp;<span class="fa fa-caret-down"></span></button>
+						<button class="btn dropdown-toggle" type="button" data-toggle="dropdown"><span class="fa fa-bullhorn"></span>&nbsp;<span class="fa fa-caret-down"></span></button>&nbsp;
 						<ul class="dropdown-menu dropdown-menu-right">
 							<li><a href="#">(Coming soon)</a></li>
+						</ul>						
+					</div>
+
+					@if (Auth::user()->auth >= USER_AUTH_ADMIN)
+					<div class="btn-group btn-group-xs">
+						<button class="btn dropdown-toggle" type="button" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;<span class="fa fa-caret-down"></span></button>
+						<ul class="dropdown-menu dropdown-menu-right">							
+							<li><a onClick="remove_video({{ $video->id }});"><i class="fa fa-trash-o"></i> Delete video</a></li>
 						</ul>
 					</div>
+					@endif
 				</div>
 			</div>
 			<div class="panel-body">
@@ -59,7 +67,7 @@
 
 				<div class="col-md-2 text-center">					
 					<p><a href="{{ $video->original_link }}" target="_blank" class="btn btn-flat btn-block btn-sm btn-labeled btn-danger"><span class="btn-label icon fa fa-youtube-play"></span>Original video</a></p>
-					<p><a href="{{ $video->working_link }}" target="_blank" class="btn btn-flat btn-block btn-sm btn-labeled btn-success"><span class="btn-label icon fa fa-rocket"></span>Translate!</a></p>
+					<p><a href="{{ $video->working_link }}" target="_blank" class="btn btn-flat btn-block btn-sm btn-labeled btn-warning"><span class="btn-label icon fa fa-rocket"></span>Translate!</a></p>
 					<p><a href="{{ URL::route('videos-details', $video->id) }}" target="_blank" class="btn btn-flat btn-block btn-sm btn-labeled btn-info"><span class="btn-label icon fa  fa-info"></span>Video details</a></p>
 				</div>
 
@@ -79,9 +87,11 @@
 					<a class="btn btn-sm btn-primary btn-labeled btn-block confirm-return" data-video-id="{{ $video->id }}" data-status="{{ VIDEO_STATUS_SYNCHRONIZING }}">
 						<span class="btn-label"><i class="fa fa-arrow-left"></i></span>Return
 					</a>
-					<a class="btn btn-sm btn-primary btn-labeled btn-block confirm-move" data-video-id="{{ $video->id }}" data-status="{{ VIDEO_STATUS_FINISHED }}">
-						<span class="btn-label">Proofreading<br> completed<br></span><br><i class="fa fa-arrow-right"></i>
-					</a>
+						@if (Auth::user()->auth >= USER_AUTH_ADMIN)
+						<a class="btn btn-sm btn-success btn-labeled btn-block confirm-move" data-video-id="{{ $video->id }}" data-status="{{ VIDEO_STATUS_FINISHED }}">
+							<span class="btn-label">Proofreading<br> completed<br></span><br><i class="fa fa-arrow-right"></i>						
+						</a>
+						@endif
 					@endif
 				</div>
 			</div>
@@ -132,8 +142,14 @@
 	$('.confirm-move').on('click', function () {
 		var video_id = $(this).attr('data-video-id');
 		var video_status = $(this).attr('data-status');		
+
+		var confirm_message = "Are you sure to move to the next stage?";
+
+		if (video_status=={{ VIDEO_STATUS_FINISHED }})		
+			confirm_message += " After this, there is no turning back!";
+		
 		bootbox.confirm({
-			message: "Are you sure?",
+			message: confirm_message,
 			callback: function(result) {
 				if (result)
 				{
@@ -152,7 +168,7 @@
 		var video_id = $(this).attr('data-video-id');
 		var video_status = $(this).attr('data-status');		
 		bootbox.confirm({
-			message: "Are you sure?",
+			message: "Are you sure you want to return?",
 			callback: function(result) {
 				if (result)
 				{
@@ -166,6 +182,24 @@
 			className: "bootbox-sm"
 		});
 	});
+
+	function remove_video(video_id)
+	{
+		bootbox.confirm({
+			message: "Are you sure you want to remove this video?",
+			callback: function(result) {
+				if (result)
+				{
+					var url = '<?php echo URL::to('/'); ?>' + '/videos/remove/' + video_id;
+					$.get(url, function(data) {					
+					   $.growl.notice({ title: "Ok!", message: "The video was removed!" });
+			           $("div[data-panel-id='"+video_id+"']").slideUp("slow");
+				    });	
+				}							
+			},
+			className: "bootbox-sm"
+		});
+	}
 
 	refresh_videos();
 

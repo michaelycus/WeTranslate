@@ -30,4 +30,48 @@ class User extends Eloquent implements UserInterface, RemindableInterface {
         return $this->hasMany('Profile');
     }
 
+    public function photo()
+    {
+    	return $this->photo ? $this->photo : URL::asset('assets/images/icon-user-default.png');
+    }
+
+    public function score()
+    {
+    	return explode(",", $this->score);
+    }
+
+    public function translated_videos()
+    {
+    	return (int)$this->score()[USER_SCORE_TRANSLATED];
+    }
+
+    public function sinchronized_videos()
+    {
+    	return (int)$this->score()[USER_SCORE_SYNCHRONIZED];
+    }
+
+    public function proofreaded_videos()
+    {
+    	return (int)$this->score()[USER_SCORE_PROOFREADED];
+    }
+
+    public function suggested_videos()
+    {
+    	return (int)$this->score()[USER_SCORE_SUGGESTED];
+    }
+
+    public function opened_videos()
+    {
+    	return (int)$this->score()[USER_SCORE_OPENED];
+    }
+
+    public function worked_in_videos()
+    {
+    	return (int)$this->score()[USER_SCORE_WORKED_IN];
+    }
+
+    public function score_total()
+    {
+    	return (int)$this->score()[USER_SCORE_TOTAL];
+    }
 }

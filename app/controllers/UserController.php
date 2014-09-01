@@ -30,4 +30,11 @@ class UserController extends BaseController
 
 		return App::abort(404);
 	}
+
+	public function getUsers()
+	{
+		$users = User::all();
+
+		return View::make('users.manage', array('users' => $users));
+	}
 }

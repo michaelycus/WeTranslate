@@ -117,7 +117,7 @@
 						 
 						<div class="tl-entry <?php echo ($i%2==0 ? '' : 'left'); $i++;  ?>">
 							<div class="tl-time">
-								{{ date("d/m/Y", strtotime($task->created_at)) }}
+								{{ date("d/m/Y H:i", strtotime($task->created_at)) }}
 							</div>
 
 							<?php
@@ -142,7 +142,7 @@
 							</div>
 
 							<div class="panel tl-body">			
-							    <img src="{{ $task->user->photo }}" alt="" class="rounded" style=" width: 20px;height: 20px;margin-top: -2px;">					
+							    <img src="{{ $task->user->photo() }}" alt="" class="rounded" style=" width: 20px;height: 20px;margin-top: -2px;">					
 								{{ $task->user->name . ' ' . $tasks_label[$task->type] }}
 							</div>
 						</div>
