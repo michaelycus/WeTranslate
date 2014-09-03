@@ -18,7 +18,8 @@ class CreateVideosTable extends Migration {
 			$table->string('original_link');
 			$table->string('working_link');
 			$table->tinyInteger('status');
-			$table->time('duration');
+			$table->integer('duration');
+			$table->string('thumbnail');
 			$table->timestamps();
 			$table->softDeletes();
 		});

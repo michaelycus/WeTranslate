@@ -22,3 +22,9 @@ img.user-list  {
   max-width: 100%;
   border-radius: 5px;
 }
+img.thumbnail_video {
+   width: 120px;
+}
+img.logo_videos {
+   width: 100px;
+}

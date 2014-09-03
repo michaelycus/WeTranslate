@@ -10,13 +10,8 @@ class Task extends Eloquent{
         return $this->belongsTo('User');
     }
 
-    public function suggestedBy()
+    public function video()
     {
-    	return $this->where('type', '=', TASK_SUGGESTED_VIDEO)->first();	
-    }
-
-    public function teste()
-    {
-    	return 'teste';
+    	return $this->belongsTo('Video');
     }
 }

@@ -3,16 +3,14 @@
 @section('content')
 
 <div class="page-header">
-	<?php $status_label = unserialize (VIDEO_STATUS_LABEL); ?>
+	<?php 
+		$status_label = unserialize (VIDEO_STATUS_LABEL);
+		$video_marks = unserialize (VIDEO_MARKS);
+	 ?>
 	<h1><span class="text-light-gray">Videos / </span>{{ $status_label[$status] }}</h1>
 </div> <!-- / .page-header -->
 
 @foreach ($videos as $video)
-<?php
-	preg_match("#(?<=v=)[a-zA-Z0-9-]+(?=&)|(?<=v\/)[^&\n]+(?=\?)|(?<=v=)[^&\n]+|(?<=youtu.be/)[^&\n]+#",  $video->original_link, $matches);
-
-	$json = json_decode(file_get_contents("http://gdata.youtube.com/feeds/api/videos/$matches[0]?v=2&alt=jsonc"));
-?>	
 
 <div class="row" data-panel-id="{{ $video->id }}">
 
@@ -20,13 +18,15 @@
 
 		<div class="panel colourable">
 			<div class="panel-heading">
-				<span class="panel-title">{{ $json->data->title }}</span>
+				<span class="panel-title">{{ $video->title }}</span>
 				<div class="panel-heading-controls">
-					<!-- <span class="label label-tag label-warning">Need proofreading</span> -->
+					<!-- <span class="label label-tag label-warning">I need some assistence!</span> -->
 					<div class="btn-group btn-group-xs">
-						<button class="btn dropdown-toggle" type="button" data-toggle="dropdown"><span class="fa fa-bullhorn"></span>&nbsp;<span class="fa fa-caret-down"></span></button>&nbsp;
+						<!-- <button class="btn dropdown-toggle" type="button" data-toggle="dropdown"><span class="fa fa-bullhorn"></span>&nbsp;<span class="fa fa-caret-down"></span></button>&nbsp; -->
 						<ul class="dropdown-menu dropdown-menu-right">
-							<li><a href="#">(Coming soon)</a></li>
+							@foreach ($video_marks as $key => $mark)
+							<!-- <li><a href="{{ $key }}">{{ $mark }}</a></li> -->
+							@endforeach
 						</ul>						
 					</div>
 
@@ -42,7 +42,7 @@
 			</div>
 			<div class="panel-body">
 				<div class="col-md-1 text-center text-lg">					
-					{{ '<img src="' . $json->data->thumbnail->sqDefault . '">' }}
+					{{ '<img src="' . $video->thumbnail . '" class="thumbnail_video">' }}
 				</div>				
 
 				<div class="col-md-4 text-center tasks-panel" id="{{ $video->id }}">
@@ -52,7 +52,7 @@
 					<ul class="list-group no-margin">
 						<!-- Without left and right borders, extra small horizontal padding -->
 						<li class="list-group-item no-border padding-xs-hr">
-							{{ gmdate("H:i:s", $json->data->duration) }} <i class="fa  fa-clock-o pull-right"></i>
+							{{ gmdate("H:i:s", $video->duration) }} <i class="fa  fa-clock-o pull-right"></i>
 						</li> <!-- / .list-group-item -->
 						<!-- Without left and right borders, extra small horizontal padding -->
 						<li class="list-group-item no-border-hr padding-xs-hr">

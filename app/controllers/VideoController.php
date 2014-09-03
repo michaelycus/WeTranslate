@@ -81,19 +81,42 @@ class VideoController extends BaseController {
 		} else {
 			$video = Video::find($id);
 
-            $video->update(array(
-				'original_link'	=> Input::get('original_link'),
-				'working_link'	=> Input::get('working_link'),
-				'status'		=> VIDEO_STATUS_TRANSLATING
-			));
+			if (strpos($video->original_link,'youtu') !== false) {
+				preg_match("#(?<=v=)[a-zA-Z0-9-]+(?=&)|(?<=v\/)[^&\n]+(?=\?)|(?<=v=)[^&\n]+|(?<=youtu.be/)[^&\n]+#",  Input::get('original_link'), $matches);
 
-			// $original_link   = Input::get('original_link');
-			// $working_link    = Input::get('working_link');
+				$json = json_decode(file_get_contents("http://gdata.youtube.com/feeds/api/videos/$matches[0]?v=2&alt=jsonc"));
 
-			// $video = Video::update(array(
-			// 	'original_link'	=> $original_link,
-			// 	'status'		=> VIDEO_FOR_APPROVAL
-			// ));
+				$video->title 			= $json->data->title;
+				$video->duration 		= $json->data->duration;
+				$video->thumbnail 		= $json->data->thumbnail->sqDefault;
+			}
+			elseif (strpos($video->original_link,'vimeo') !== false) {
+				$oembed_endpoint = 'http://vimeo.com/api/oembed';
+
+				$json_url = $oembed_endpoint . '.json?url=' . rawurlencode($video->original_link) . '&width=640';		
+
+				function curl_get($json_url) {
+				    $curl = curl_init($json_url);
+				    curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+				    curl_setopt($curl, CURLOPT_TIMEOUT, 30);
+				    curl_setopt($curl, CURLOPT_FOLLOWLOCATION, 1);
+				    $return = curl_exec($curl);
+				    curl_close($curl);
+				    return $return;
+				}
+				
+				$json = json_decode(curl_get($json_url));
+
+				$video->title 			= $json->title;
+				$video->duration 		= $json->duration;
+				$video->thumbnail 		= $json->thumbnail_url;
+			}
+
+			$video->original_link 	= Input::get('original_link');
+			$video->working_link 	= Input::get('working_link');
+			$video->status 		= VIDEO_STATUS_TRANSLATING;			
+
+			$video->save();
 
 			if ($video){
 				// Mail::send('emails.auth.activate', array('link' => URL::route('account-activate', $code) , 'name' => $name), function($message) use ($user){
@@ -232,7 +255,7 @@ class VideoController extends BaseController {
 
 				$text .= ' [ ';
 				foreach ($type as $t) {
-					if ($t != TASK_APPROVED_VIDEO) // Don't need to present approved icon
+					if ($t < TASK_REJECTED_VIDEO) // Don't need to present approved icon
 						$text .= ' <i class="menu-icon fa '. $icons[$t] . ' text-primary"></i> ';
 
 					if ($currentUser == $user_id && $t == $status) // current is participating of the task
@@ -362,11 +385,7 @@ class VideoController extends BaseController {
 		// get video info
 		$video = Video::find($video_id);
 
-		preg_match("#(?<=v=)[a-zA-Z0-9-]+(?=&)|(?<=v\/)[^&\n]+(?=\?)|(?<=v=)[^&\n]+|(?<=youtu.be/)[^&\n]+#",  $video->original_link, $matches);
-
-		$json = json_decode(file_get_contents("http://gdata.youtube.com/feeds/api/videos/$matches[0]?v=2&alt=jsonc"));
-
-		$duration_points = $json->data->duration / 60;
+		$duration_points = $video->duration / 60;
 
 		// setting score to the user
 		foreach ($user_task as $user_id => $type) {
@@ -436,6 +455,94 @@ class VideoController extends BaseController {
  
   //       return Response::json( $response );
 
-		return 'teste fudido';
+		// $videos = Video::all();
+
+		// foreach ($videos as $video) {
+
+		// 	preg_match("#(?<=v=)[a-zA-Z0-9-]+(?=&)|(?<=v\/)[^&\n]+(?=\?)|(?<=v=)[^&\n]+|(?<=youtu.be/)[^&\n]+#",  $video->original_link, $matches);
+
+		// 	$json = json_decode(file_get_contents("http://gdata.youtube.com/feeds/api/videos/$matches[0]?v=2&alt=jsonc"));
+
+  //           $video->title 			= $json->data->title;
+		// 	$video->duration 		= $json->data->duration;
+		// 	$video->thumbnail 		= $json->data->thumbnail->sqDefault;				
+
+		// 	$video->save();
+
+		// 	echo $video->title. '<br>';
+		// }
+
+		// $vimeo = 'https://vimeo.com/29474908';
+
+		// echo (int) substr(parse_url($vimeo, PHP_URL_PATH), 1);
+
+		// $s = 'https://www.youtube.com/watch?v=hqmzsf-AodM';
+
+		// if (strpos($s,'vimeo') !== false) {
+		//     echo 'vimeo';
+		// }
+		// elseif (strpos($s,'youtu') !== false) {
+		// 	echo 'youtube';
+		// }
+
+		// $imgid = 6271487;
+
+		// $hash = unserialize(file_get_contents("http://vimeo.com/api/v2/video/$imgid.php"));
+
+		// echo $hash[0]['thumbnail_medium']; 
+
+
+  //       $value = 'https://vimeo.com/100415419d';
+
+		// $video_id = (int) substr(parse_url($value, PHP_URL_PATH), 1);
+
+		// try
+		// {
+		// 	$hash = unserialize(file_get_contents("http://vimeo.com/api/v2/video/$video_id.php"));
+
+		// 	if ($hash)
+		// 	{
+		// 		echo $hash[0]['thumbnail_medium']; ;
+		// 	}
+		// 	else
+		// 	{
+		// 		echo 'erro';
+		// 	}
+		// }
+		// catch (\Exception $e)
+		// {
+		// 	echo 'errou';
+		// }	
+
+
+		$oembed_endpoint = 'http://vimeo.com/api/oembed';
+
+		// Grab the video url from the url, or use default
+		$video_url = 'http://vimeo.com/7100569';
+
+		// Create the URLs
+		$json_url = $oembed_endpoint . '.json?url=' . rawurlencode($video_url) . '&width=640';		
+
+		// Curl helper function
+		function curl_get($json_url) {
+		    $curl = curl_init($json_url);
+		    curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+		    curl_setopt($curl, CURLOPT_TIMEOUT, 30);
+		    curl_setopt($curl, CURLOPT_FOLLOWLOCATION, 1);
+		    $return = curl_exec($curl);
+		    curl_close($curl);
+		    return $return;
+		}
+
+		// Load in the oEmbed XML
+		$oembed = json_decode(curl_get($json_url));
+
+		var_dump($oembed);
+
+		
+
+
+
+		// return 'teste fudido';
 	}
 }

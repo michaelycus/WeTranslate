@@ -36,9 +36,8 @@ class HomeController extends BaseController {
 			    'count_user_worked'    => Auth::user()->worked_in_videos(),
 			    'count_user_score'     => Auth::user()->score_total(),
 
-			    'last_videos'		   => Video::orderBy('id', 'desc')->take(10)->get(),
-			    'last_tasks'		   => Task::orderBy('id', 'desc')->take(10)->get(),
-			    'last_users'		   => Task::orderBy('id', 'desc')->take(10)->get(),
+			    'last_videos'		   => Video::where('status', '>', VIDEO_FOR_APPROVAL)->orderBy('id', 'desc')->take(10)->get(),
+			    'last_tasks'		   => Task::where('type', '>', TASK_SUGGESTED_VIDEO)->orderBy('id', 'desc')->take(10)->get(),			    
 			);
 
 			return View::make('dashboard')->with($data);

@@ -36,34 +36,66 @@ define('TASK_BACK_TO_TRANS', 	10);
 define('TASK_BACK_TO_SYNC', 	11);
 define('TASK_BACK_TO_PROOF', 	12);
 
-define('TASKS_TYPE_LABEL', serialize(array('suggested the video.',
-                                           'is translating.',
-                                           'is helping to sync.',
-                                           'is proofreading the video.',
-                                           'finished the video.',
-                                           'rejected the video',
-                                           'approved the video.',
-                                           'move the video to synchronization.',
-                                           'move the video to proofreading.',
-                                           'finish the video.',
-                                           'return the video to translating.',
-                                           'return the video to synchronization',
-                                           'return the video to proofreading')));
+define('TASKS_TYPE_LABEL', serialize(
+                              array('suggested the video.',
+                                    'is translating.',
+                                    'is helping to sync.',
+                                    'is proofreading the video.',
+                                    'finished the video.',
+                                    'rejected the video',
+                                    'approved the video.',
+                                    'move the video to synchronization.',
+                                    'move the video to proofreading.',
+                                    'finish the video.',
+                                    'return the video to translating.',
+                                    'return the video to synchronization',
+                                    'return the video to proofreading')));
+
+define('TASKS_TYPE_LABEL_DASHBOARD', serialize(
+                                       array('suggested',
+                                             'is translating',
+                                             'is helping to sync',
+                                             'is proofreading',
+                                             'finished',
+                                             'rejected',
+                                             'approved',
+                                             'moved to synchronization',
+                                             'moved to proofreading',
+                                             'finished',
+                                             'returned to translating',
+                                             'returned to synchronization',
+                                             'returned to proofreading')));
 
 
-define('IMG_VIDEO_STATUS', serialize(array('fa-star', 
-										   'fa-text-width',										   
-										   'fa-clock-o',
-										   'fa-eye',
-										   'fa-check',
-										   'fa-thumbs-down',
-										   'fa-thumbs-up',
-                                           'fa-arrow-right',
-                                           'fa-arrow-right',
-                                           'fa-arrow-check',
-                                           'fa-arrow-left',
-                                           'fa-arrow-left',
-                                           'fa-arrow-left')));
+define('IMG_VIDEO_STATUS', serialize(
+                              array('fa-star', 
+              										  'fa-text-width',										   
+              										  'fa-clock-o',
+              										  'fa-eye',
+              										  'fa-check',
+              										  'fa-thumbs-down',
+              										  'fa-thumbs-up',
+                                    'fa-arrow-right',
+                                    'fa-arrow-right',
+                                    'fa-arrow-check',
+                                    'fa-arrow-left',
+                                    'fa-arrow-left',
+                                    'fa-arrow-left')));
+
+define('VIDEO_MARKS', serialize(
+                          array('I need some assistence!', 
+                                'It need a review!',                       
+                                'I do not know how to synchronize!',
+                                'It deserves a better synchronization!',
+                                'It needs one more review!',
+                                'It needs two more reviews!',
+                                'I believe it is done!')));
+
+
+define('VIDEO_MARK_I_NEED_SOME_ASSISTENCE',   0);
+
+
+
 
 define('USER_SCORE_TRANSLATED',   0);
 define('USER_SCORE_SYNCHRONIZED', 1);
@@ -76,6 +108,8 @@ define('USER_SCORE_TOTAL',        6);
 define('SCORE_TRANSLATED',        30);
 define('SCORE_SYNCHRONIZED',      20);
 define('SCORE_PROOFREADED',       15);
+
+
 
 function time_elapsed_string($datetime, $full = false) 
 {

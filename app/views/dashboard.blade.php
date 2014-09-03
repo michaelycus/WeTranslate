@@ -31,19 +31,19 @@
 						<h4 class="padding-sm no-padding-t padding-xs-hr"><i class="fa fa-film text-primary"></i>&nbsp;&nbsp;Videos</h4>
 						<ul class="list-group no-margin">
 							<li class="list-group-item no-border-hr padding-xs-hr no-bg no-border-radius">
-								Translation <span class="label label-pa-purple pull-right">{{ $count_videos_trans }}</span>
-							</li> <!-- / .list-group-item -->
+								Translation <span class="label label-danger pull-right">{{ $count_videos_trans }}</span>
+							</li>
 							<li class="list-group-item no-border-hr padding-xs-hr no-bg">
-								Synchronizing <span class="label label-danger pull-right">{{ $count_videos_synch }}</span>
-							</li> <!-- / .list-group-item -->
+								Synchronizing <span class="label label-warning pull-right">{{ $count_videos_synch }}</span>
+							</li>
 							<li class="list-group-item no-border-hr padding-xs-hr no-bg">
-								Proofreading <span class="label label-danger pull-right">{{ $count_videos_proof }}</span>
-							</li> <!-- / .list-group-item -->
+								Proofreading <span class="label label-pa-purple pull-right">{{ $count_videos_proof }}</span>
+							</li>
 							<li class="list-group-item no-border-hr no-border-b padding-xs-hr no-bg">
 								Completed <span class="label label-success pull-right">{{ $count_videos_finish }}</span>
 							</li>
 						</ul>
-					</div> <!-- /.stat-cell -->
+					</div>
 
 					
 					<div class="stat-cell col-sm-6 no-padding bordered valign-middle">
@@ -86,7 +86,7 @@
 								<!-- Big text -->
 								<span class="text-bg">Points in translation</span><br>
 								<!-- Small text -->
-								<span class="text-sm"><a href="#">In {{ $count_user_worked }} different videos</a></span>
+								<span class="text-sm"><a href="#">from {{ $count_user_worked }} different videos</a></span>
 							</div> <!-- /.stat-cell -->
 						</div> <!-- /.stat-cell -->
 						<div class="stat-row">
@@ -117,11 +117,11 @@
 						</div>
 					</div>
 				</div>	
-			</div>	
+			</div>
 		</div>
 
 
-				<!-- Page wide horizontal line -->
+		<!-- Page wide horizontal line -->
 		<hr class="no-grid-gutter-h grid-gutter-margin-b no-margin-t">
 
 		<div class="row">
@@ -134,11 +134,11 @@
 			</script>
 			<!-- / Javascript -->
 
-			<div class="col-md-4">	
+			<div class="col-md-6">	
 				
-				<div class="panel panel-warning" id="dashboard-recent">
+				<div class="panel" id="dashboard-recent">
 					<div class="panel-heading">
-						<span class="panel-title"><i class="panel-title-icon fa fa-fire text-danger"></i>Last suggested videos</span>						
+						<span class="panel-title"><i class="panel-title-icon fa fa-star text-danger"></i>Last suggested videos</span>						
 					</div> <!-- / .panel-heading -->
 					<div class="tab-content">
 
@@ -146,17 +146,12 @@
 						<div class="widget-threads panel-body tab-pane no-padding  fade active in">
 							<div class="panel-padding no-padding-vr">
 
-								@foreach ($last_videos as $video)
-								<?php
-									preg_match("#(?<=v=)[a-zA-Z0-9-]+(?=&)|(?<=v\/)[^&\n]+(?=\?)|(?<=v=)[^&\n]+|(?<=youtu.be/)[^&\n]+#",  $video->original_link, $matches);
-
-									$json = json_decode(file_get_contents("http://gdata.youtube.com/feeds/api/videos/$matches[0]?v=2&alt=jsonc"));
-								?>	
+								@foreach ($last_videos as $video)								
 								<div class="thread">									
-									{{ '<img src="' . $json->data->thumbnail->sqDefault . '"  alt="" class="thread-avatar">' }}
+									{{ '<img src="' . $video->thumbnail . '"  alt="" class="thread-avatar">' }}
 									<div class="thread-body">
 										<span class="thread-time">{{ time_elapsed_string($video->created_at) }}</span>
-										<a href="{{ URL::route('videos-details', $video->id) }}" class="thread-title">{{ $json->data->title }}</a>
+										<a href="{{ URL::route('videos-details', $video->id) }}" class="thread-title">{{ $video->title }}</a>
 										<div class="thread-info">suggested by <a href="" title="">{{ $video->suggestedBy()['fullname'] }}</a></div>
 									</div>
 								</div>
@@ -168,83 +163,37 @@
 				</div> <!-- / .widget-threads -->
 			</div>
 
-			<div class="col-md-4">	
+			<div class="col-md-6">	
 				
-				<div class="panel panel-warning darken" id="dashboard-recent">
+				<div class="panel" id="dashboard-recent">
 					<div class="panel-heading">
-						<span class="panel-title"><i class="panel-title-icon fa fa-fire text-danger"></i>Last activities</span>						
+						<span class="panel-title"><i class="panel-title-icon fa fa-tasks text-danger"></i>Last activities</span>						
 					</div> <!-- / .panel-heading -->
 					<div class="tab-content">
 
 						<!-- Without padding -->
 						<div class="widget-threads panel-body tab-pane no-padding  fade active in">
 							<div class="panel-padding no-padding-vr">
-								<div class="thread">
-									<img src="assets/demo/avatars/2.jpg" alt="" class="thread-avatar">
-									<div class="thread-body">
-										<span class="thread-time">14h</span>
-										<a href="#" class="thread-title">Lorem ipsum dolor sit amet</a>
-										<div class="thread-info">started by <a href="#" title="">Robert Jang</a> in <a href="#" title="">Forum name</a></div>
-									</div> <!-- / .thread-body -->
-								</div> <!-- / .thread -->
 
+								<?php $tasks_label = unserialize(TASKS_TYPE_LABEL_DASHBOARD); ?>
+								@foreach ($last_tasks as $task)
 								<div class="thread">
-									<img src="assets/demo/avatars/3.jpg" alt="" class="thread-avatar">
+									<img src="{{ $task->user->photo() }}" alt="" class="thread-avatar">
 									<div class="thread-body">
-										<span class="thread-time">14h</span>
-										<a href="#" class="thread-title">Lorem ipsum dolor sit amet</a>
-										<div class="thread-info">started by <a href="#" title="">Michelle Bortz</a> in <a href="#" title="">Forum name</a></div>
-									</div> <!-- / .thread-body -->
-								</div> <!-- / .thread -->
-
-								<div class="thread">
-									<img src="assets/demo/avatars/4.jpg" alt="" class="thread-avatar">
-									<div class="thread-body">
-										<span class="thread-time">14h</span>
-										<a href="#" class="thread-title">Lorem ipsum dolor sit amet</a>
-										<div class="thread-info">started by <a href="#" title="">Timothy Owens</a> in <a href="#" title="">Forum name</a></div>
-									</div> <!-- / .thread-body -->
-								</div> <!-- / .thread -->
+										<span class="thread-time">{{ time_elapsed_string($task->created_at) }}</span>
+										<a href="#" title="">{{ $task->user->name }}</a> {{ $tasks_label[$task->type] }}										
+										<div class="thread-info">the video <a href="{{ URL::route('videos-details', $task->video_id) }}" title="">{{ $task->video->title }}</a></div>
+									</div>
+								</div>
+								@endforeach
 
 							</div>
 						</div> <!-- / .panel-body -->
 					</div>
 				</div> <!-- / .widget-threads -->
 			</div>
-
-
-			<div class="col-md-4">	
-				
-				<div class="panel panel-warning darker" id="dashboard-recent">
-					<div class="panel-heading">
-						<span class="panel-title"><i class="panel-title-icon fa fa-fire text-danger"></i>Last user logged</span>						
-					</div> <!-- / .panel-heading -->
-					<div class="tab-content">
-
-						<!-- Without padding -->
-						<div class="widget-threads panel-body tab-pane no-padding  fade active in">
-							<div class="panel-padding no-padding-vr">
-								<div class="thread">
-									<img src="assets/demo/avatars/2.jpg" alt="" class="thread-avatar">
-									<div class="thread-body">
-										<span class="thread-time">14h</span>
-										<a href="#" class="thread-title">Lorem ipsum dolor sit amet</a>
-										<div class="thread-info">started by <a href="#" title="">Robert Jang</a> in <a href="#" title="">Forum name</a></div>
-									</div> <!-- / .thread-body -->
-								</div> <!-- / .thread -->
-
-							
-							</div>
-						</div> <!-- / .panel-body -->
-					</div>
-				</div> <!-- / .widget-threads -->
-			</div>
-
-
 
 		</div>
-
-
 
 	</div>
 </div>	

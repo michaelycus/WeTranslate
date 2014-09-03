@@ -36,16 +36,11 @@
 					</thead>
 					<tbody>
 
-				@foreach ($videos as $video)
-				<?php
-					preg_match("#(?<=v=)[a-zA-Z0-9-]+(?=&)|(?<=v\/)[^&\n]+(?=\?)|(?<=v=)[^&\n]+|(?<=youtu.be/)[^&\n]+#",  $video->original_link, $matches);
-
-					$json = json_decode(file_get_contents("http://gdata.youtube.com/feeds/api/videos/$matches[0]?v=2&alt=jsonc"));
-				?>	
+				@foreach ($videos as $video)				
 					<tr data-video-id="{{ $video->id }}">
-						<td class="text-center">{{ '<img src="' . $json->data->thumbnail->sqDefault . '">' }}</td>
-						<td>{{ $json->data->title }}</td>
-						<td>{{ gmdate("H:i:s", $json->data->duration) }}</td>
+						<td class="text-center">{{ '<img src="' . $video->thumbnail . '">' }}</td>
+						<td>{{ $video->title }}</td>
+						<td>{{ gmdate("H:i:s", $video->duration) }}</td>
 						<td>{{ date("d/m/Y", strtotime($video->created_at)) }}</td>
 						<td class="text-center">
 							<a href="{{ $video->original_link }}" target="_blank"><span class="fa fa-youtube-play text-danger text-lg"></span></a>&nbsp;&nbsp;

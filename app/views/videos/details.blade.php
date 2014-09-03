@@ -121,6 +121,7 @@
 							</div>
 
 							<?php
+							$background = '';
 							switch ($task->type) {
 								case TASK_SUGGESTED_VIDEO: $background = 'bg-info'; break;
 								case TASK_IS_TRANSLATING: 

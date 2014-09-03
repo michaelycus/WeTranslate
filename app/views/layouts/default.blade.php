@@ -43,7 +43,7 @@
 			<div class="navbar-header">
 
 				<!-- Logo -->
-				<a href="index.html" class="navbar-brand">
+				<a href="{{ URL::route('home') }}" class="navbar-brand">
 					<div><img alt="Pixel Admin" src="{{ URL::asset('assets/images/pixel-admin/main-navbar-logo.png') }}"></div>
 					WeTranslate
 				</a>
@@ -66,8 +66,8 @@
 									<span>{{ Auth::user()->name }}</span>
 								</a>
 								<ul class="dropdown-menu"> 
-									<li><a href="{{ URL::route('user-profile', Auth::id()) }}) }}">Profile</a></li>									
-									<li><a href="{{ URL::route('users-manage')}}"><i class="dropdown-icon fa fa-users"></i>&nbsp;&nbsp;Manage users</a></li>
+									<li><a href="{{ URL::route('user-profile', Auth::id()) }}"><i class="dropdown-icon fa fa-user"></i>&nbsp;&nbsp;Profile</a></li>									
+									<li><a href="{{ URL::route('users-manage') }}"><i class="dropdown-icon fa fa-users"></i>&nbsp;&nbsp;Manage users</a></li>
 									<li class="divider"></li>
 									<li><a href="{{ URL::route('account-sign-out') }}"><i class="dropdown-icon fa fa-power-off"></i>&nbsp;&nbsp;Log Out</a></li>
 								</ul>
@@ -93,16 +93,16 @@
 
 					<img src="{{ Auth::user()->photo(); }}" alt="" class="">
 					<div class="btn-group">						
-						<a href="#" class="btn btn-xs btn-primary btn-outline dark"><i class="fa fa-user"></i></a>
-						<a href="#" class="btn btn-xs btn-primary btn-outline dark"><i class="fa fa-cog"></i></a>
-						<a href="#" class="btn btn-xs btn-danger btn-outline dark"><i class="fa fa-power-off"></i></a>
+						<a href="{{ URL::route('user-profile', Auth::id()) }}" class="btn btn-xs btn-primary btn-outline dark"><i class="fa fa-user"></i></a>
+						<!-- <a rhef="#" class="btn btn-xs btn-primary btn-outline dark"><i class="fa fa-cog"></i></a> -->
+						<a href="{{ URL::route('account-sign-out') }}" class="btn btn-xs btn-danger btn-outline dark"><i class="fa fa-power-off"></i></a>
 					</div>
 					<a href="#" class="close">&times;</a>
 				</div>
 			</div>
 			<ul class="navigation">
 				<li>
-					<!-- <a href="index.html"><i class="menu-icon fa fa-dashboard"></i><span class="mm-text">Dashboard</span></a> -->
+					<a href="{{ URL::route('home') }}"><i class="menu-icon fa fa-dashboard"></i><span class="mm-text">Dashboard</span></a>
 				</li>
 				<li>
 					<a href="{{ URL::route('videos-translating') }}"><i class="menu-icon fa fa-text-width"></i><span class="mm-text">Translating</span></a>
