@@ -18,13 +18,13 @@
 	<link href="{{ URL::asset('assets/stylesheets/pages.min.css') }}" rel="stylesheet" type="text/css">
 	<link href="{{ URL::asset('assets/stylesheets/rtl.min.css') }}" rel="stylesheet" type="text/css">
 	<link href="{{ URL::asset('assets/stylesheets/themes.min.css') }}" rel="stylesheet" type="text/css">
+	<link href="{{ URL::asset('assets/stylesheets/custom.css') }}" rel="stylesheet" type="text/css">
 
 	<!--[if lt IE 9]>
 		<script src="assets/javascripts/ie.min.js"></script>
 	<![endif]-->
 
 </head>
-
 
 <!-- 1. $BODY ======================================================================================
 	
@@ -40,20 +40,27 @@
 	<div class="signup-header">
 		<a href="{{ URL::route('home') }}" class="logo">
 			<div class="demo-logo bg-primary"><img src="assets/demo/logo-big.png" alt="" style="margin-top: -4px;"></div>&nbsp;
-			<strong>We</strong>Translate
+			<img src="{{ URL::asset('assets/images/logo.png') }}" alt="" class="official_logo">
+			<!-- <strong>We</strong>Translate -->
 		</a> <!-- / .logo -->
 		<a href="{{ URL::route('home') }}" class="btn btn-primary">Sign In</a>
 	</div> <!-- / .header -->
 
 	<h1 class="form-header">Create your Account</h1>
 
-
 	<!-- Form -->	
-	<form action="{{ URL::route('account-create-post') }}" method="post" class="panel" id="signup-form_id">	
+	<form action="{{ URL::route('account-sign-up-post') }}" method="post" class="panel" id="signup-form_id">	
 		<div class="form-group">
-			<input type="text" name="name" class="form-control input-lg" placeholder="Full name" {{ Input::old('name') ? ' value="'. e(Input::old('name'))  .'"' : '' }}>
-			@if($errors->has('name'))
-				<p class="help-block">{{ $errors->first('name') }}</p>
+			<input type="text" name="firstname" class="form-control input-lg" placeholder="First name" {{ Input::old('firstname') ? ' value="'. e(Input::old('firstname'))  .'"' : '' }}>
+			@if($errors->has('firstname'))
+				<p class="help-block">{{ $errors->first('firstname') }}</p>
+			@endif
+		</div>
+
+		<div class="form-group">
+			<input type="text" name="lastname" class="form-control input-lg" placeholder="Last name" {{ Input::old('lastname') ? ' value="'. e(Input::old('lastname'))  .'"' : '' }}>
+			@if($errors->has('lastname'))
+				<p class="help-block">{{ $errors->first('lastname') }}</p>
 			@endif
 		</div>
 
@@ -88,7 +95,7 @@
 
 	<div class="signup-with">
 		<div class="header">or sign up with</div>
-		<a href="index.html" class="btn btn-lg btn-facebook rounded"><i class="fa fa-facebook"></i></a>&nbsp;&nbsp;		
+		<a href="{{ URL::route('login-fb') }}" class="btn btn-lg btn-facebook rounded"><i class="fa fa-facebook"></i></a>&nbsp;&nbsp;		
 	</div>
 
 

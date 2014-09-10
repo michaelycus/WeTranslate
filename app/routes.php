@@ -11,17 +11,7 @@
 |
 */
 
-Route::get('/', array('as' => 'home', 'uses' => 'HomeController@getIndex'));//->before('auth ');
-
-// Route::get('translating', array('as' => 'translating', 'uses' => 'HomeController@getTranslating'));
-
-// Route::get('/login', array('as' => 'login', 'uses' => 'AuthController@getLogin'))->before('guest');
-// Route::post('login', array('uses' => 'AuthController@postLogin'))->before('csrf');
-
-Route::get('/user/{id}', array(
-	'as' => 'profile-user',
-	'uses' => 'ProfileController@user'
-));
+Route::get('/', array('as' => 'home', 'uses' => 'AccountController@getIndex'));//->before('auth ');
 
 /*
 | Authenticated group
@@ -66,20 +56,40 @@ Route::group(array('before' => 'auth'), function(){
 	));
 
 	/*
-	| VIDEOS
+	| VIDEOS - Status
 	*/
 	Route::get('/videos/translating', array(
 		'as' => 'videos-translating',
 		'uses' => 'VideoController@getTranslating'
 	));
 
-
-	Route::get('/videos/teste', array(
-		'as' => 'videos-teste',
-		'uses' => 'VideoController@getTeste'
+	Route::get('/videos/synchronizing', array(
+		'as' => 'videos-synchronizing',
+		'uses' => 'VideoController@getSynchronizing'
 	));
 
+	Route::get('/videos/proofreading', array(
+		'as' => 'videos-proofreading',
+		'uses' => 'VideoController@getProofreading'
+	));
 
+	Route::get('/videos/finished', array(
+		'as' => 'videos-finished',
+		'uses' => 'VideoController@getFinished'
+	));
+
+	/*
+	| VIDEOS - Details
+	*/
+
+	Route::get('/videos/details/{id}', array(
+		'as' => 'videos-details',
+		'uses' => 'VideoController@getDetails'
+	));
+
+    /*
+	| VIDEOS - Ajax calls
+	*/
 
 	Route::get('/videos/tasks/{video_id}/{status}', array(
 		'as' => 'videos-tasks',
@@ -106,32 +116,28 @@ Route::group(array('before' => 'auth'), function(){
 		'uses' => 'VideoController@getRemove'
 	));
 
-
-
-
-	Route::get('/videos/synchronizing', array(
-		'as' => 'videos-synchronizing',
-		'uses' => 'VideoController@getSynchronizing'
+	Route::get('/videos/move-to/{id}/{status}', array(
+		'as' => 'videos-move-to',
+		'uses' => 'VideoController@getMoveTo'
 	));
 
-	Route::get('/videos/proofreading', array(
-		'as' => 'videos-proofreading',
-		'uses' => 'VideoController@getProofreading'
+	Route::get('/videos/return-to/{id}/{status}', array(
+		'as' => 'videos-return-to',
+		'uses' => 'VideoController@getReturnTo'
 	));
 
-	Route::get('/videos/finished', array(
-		'as' => 'videos-finished',
-		'uses' => 'VideoController@getFinished'
+ 	/*
+	| VIDEOS - Suggest, verify, approve
+	*/	
+
+	Route::get('/videos/suggest', array(
+		'as' => 'videos-suggest',
+		'uses' => 'VideoController@getSuggest'
 	));
 
-	Route::get('/videos/for-approval', array(
-		'as' => 'videos-for-approval',
-		'uses' => 'VideoController@getForApproval'
-	));
-
-	Route::post('/videos/for-approval', array(
-		'as' => 'videos-for-approval-post',
-		'uses' => 'VideoController@postForApproval'
+	Route::post('/videos/suggest', array(
+		'as' => 'videos-suggest-post',
+		'uses' => 'VideoController@postSuggest'
 	));
 
 	Route::get('/videos/verify/{id}', array(
@@ -144,161 +150,43 @@ Route::group(array('before' => 'auth'), function(){
 		'uses' => 'VideoController@postVerify'
 	));
 
-	Route::get('/videos/suggest', array(
-		'as' => 'videos-suggest',
-		'uses' => 'VideoController@getSuggest'
+	Route::get('/videos/for-approval', array(
+		'as' => 'videos-for-approval',
+		'uses' => 'VideoController@getForApproval'
 	));
 
-	Route::post('/videos/suggest', array(
-		'as' => 'videos-suggest-post',
-		'uses' => 'VideoController@postSuggest'
+	Route::post('/videos/for-approval', array(
+		'as' => 'videos-for-approval-post',
+		'uses' => 'VideoController@postForApproval'
 	));
-
-	Route::get('/videos/details/{id}', array(
-		'as' => 'videos-details',
-		'uses' => 'VideoController@getDetails'
-	));
-
-	Route::get('/videos/move-to/{id}/{status}', array(
-		'as' => 'videos-move-to',
-		'uses' => 'VideoController@getMoveTo'
-	));
-
-	Route::get('/videos/return-to/{id}/{status}', array(
-		'as' => 'videos-return-to',
-		'uses' => 'VideoController@getReturnTo'
-	));
-
-
 
 	/*
 	| USERS
 	*/
 	Route::get('/users/{id}', array(
-		'as' => 'user-profile',
+		'as' => 'users-profile',
 		'uses' => 'UserController@getUser'
-	));
+	));	
 
 	/*
-	| TESTE
+	| TEST
 	*/
-	Route::get('/teste', function()
-	{		
-		$ch = curl_init();
+	Route::get('/teste/teste', array(
+		'as' => 'teste-teste',
+		'uses' => 'TestController@getTeste'
+	));
 
-		curl_setopt($ch, CURLOPT_HTTPHEADER, array(
-		    'X-api-username: Michael39',
-		    'X-apikey: dcdda23f59b8d2cec74f4f29d18d03c403dbcf4b'
-	    ));
-
-		curl_setopt($ch, CURLOPT_URL, "https://www.universalsubtitles.org/api2/partners/videos/iv6T7WyO5Ujo/");
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-		curl_setopt($ch, CURLOPT_HEADER, 0);
-		curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
-
-		 curl_setopt($ch, CURLOPT_VERBOSE, 1);
-
-		$curl_response = curl_exec($ch);
-
-		$info = curl_getinfo($ch);
- 
-		echo 'Took ' . $info['total_time'] . ' seconds for url ' . $info['url'];
-		echo '<br/><br/><br/>';
-
-		var_dump($info);
-		echo '<br/><br/><br/>';
-
-		var_dump($_SERVER);
-		echo '<br/><br/><br/>';
-
-		if ($curl_response === FALSE) { 
-		    echo "cURL Error: " . curl_error($ch);		 
-		}else
-		{
-			echo 'feito... <br/>';
-			echo (format_json($curl_response, true));
-		}
-
-		curl_close($ch);
-	});
-
-	Route::get('/teste2', function()
-	{		
-		$ch = curl_init();
-
-		curl_setopt($ch, CURLOPT_HTTPHEADER, array(
-		    'X-api-username: Michael39',
-		    'X-apikey: dcdda23f59b8d2cec74f4f29d18d03c403dbcf4b'
-	    ));
-
-		curl_setopt($ch, CURLOPT_URL, "https://www.universalsubtitles.org/api2/partners/videos/iv6T7WyO5Ujo/");
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);		
-		curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);		 
-
-		$curl_response = curl_exec($ch);		
-
-		if ($curl_response === FALSE) { 
-		    echo "cURL Error: " . curl_error($ch);		 
-		}else
-		{			
-			echo (format_json($curl_response, true));
-		}
-
-		curl_setopt($ch, CURLOPT_URL, "https://www.universalsubtitles.org/api2/partners/videos/eRXNBZ2M059G/");
-
-		$curl_response = curl_exec($ch);		
-
-		echo (format_json($curl_response, true));
-
-		curl_close($ch);
-	});
-
-	Route::get('/createamara', function()
-	{		
-		$ch = curl_init();
-
-		curl_setopt($ch, CURLOPT_HTTPHEADER, array(
-		    'X-api-username: Michael39',
-		    'X-apikey: dcdda23f59b8d2cec74f4f29d18d03c403dbcf4b',
-		    'Accept: application/json'
-	    ));
-
-		curl_setopt($ch, CURLOPT_URL, "https://www.amara.org/api2/partners/videos/");
-
-		$data = array('video_url' => 'http://vimeo.com/10778141');
-		// $data = array('video_url' => 'https://www.youtube.com/watch?v=DK61hj7F-O8', 'primary_audio_language_code ' => 'pt-br');
-		curl_setopt($ch, CURLOPT_POST, 1);
-		curl_setopt($ch, CURLOPT_POSTFIELDS,$data);
-
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);		
-		curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);		 
-
-
-		$info = curl_getinfo($ch);
-		var_dump($info);
-
-		$curl_response = curl_exec($ch);		
-
-		if ($curl_response === FALSE) { 
-		    echo "cURL Error: " . curl_error($ch);		 
-		}else
-		{			
-			echo (format_json($curl_response, true));
-		}
-
-		curl_close($ch);
-	});
+	Route::get('/teste/amara', array(
+		'as' => 'teste-amara',
+		'uses' => 'TestController@getAmara'
+	));
 
 });
-
-
-
 
 /*
 | Unauthenticated group
 */
 Route::group(array('before' => 'guest'), function(){
-
 	/*
 	| CSRF protection group
 	*/	
@@ -306,9 +194,9 @@ Route::group(array('before' => 'guest'), function(){
 		/*
 		| Create account (POST)
 		*/	
-		Route::post('/account/create', array(
-			'as' => 'account-create-post',
-			'uses' => 'HomeController@postCreate'
+		Route::post('/account/sign-up', array(
+			'as' => 'account-sign-up-post',
+			'uses' => 'AccountController@postSignUp'
 		));	
 
 		/*
@@ -316,7 +204,7 @@ Route::group(array('before' => 'guest'), function(){
 		*/	
 		Route::post('/account/sign-in', array(
 			'as' => 'account-sign-in-post',
-			'uses' => 'HomeController@postSignIn'
+			'uses' => 'AccountController@postSignIn'
 		));
 	});
 
@@ -325,22 +213,25 @@ Route::group(array('before' => 'guest'), function(){
 	*/	
 	Route::get('/account/sign-in', array(
 		'as' => 'account-sign-in',
-		'uses' => 'HomeController@getSignIn'
+		'uses' => 'AccountController@getSignIn'
 	));	
 
 	/*
 	| Create account (GET)
 	*/	
-	Route::get('/signup', array(
-		'as' => 'signup',
-		'uses' => 'HomeController@signup'		
+	Route::get('/account/sign-up', array(
+		'as' => 'account-sign-up',
+		'uses' => 'AccountController@getSignup'		
 	));	
 
 	Route::get('/account/activate/{code}', array(
 		'as' => 'account-activate',
-		'uses' => 'HomeController@getActivate'
-	));		
+		'uses' => 'AccountController@getActivate'
+	));
 
+	/*
+	| Login Facebook (GET)
+	*/
 	Route::get('login/fb', array('as' => 'login-fb', function() {
 	    $facebook = new Facebook(Config::get('facebook'));
 	    $params = array(
@@ -366,6 +257,7 @@ Route::group(array('before' => 'guest'), function(){
 	        $user = new User;
 	        $user->name = $me['first_name'];
 	        $user->fullname = $me['first_name'].' '.$me['last_name'];
+	        $user->username = $me['id'];
 	        $user->email = $me['email'];
 	        $user->photo = 'https://graph.facebook.com/'.$me['id'].'/picture?type=large';
 
@@ -387,6 +279,9 @@ Route::group(array('before' => 'guest'), function(){
 	    return Redirect::to('/')->with('message', 'Logged in with Facebook');
 	}));
 
-});
+	Route::get('teste', function()
+	{
+	    return phpinfo();
+	});
 
-Validator::extend('awesome', 'CustomValidation@awesome');
+});

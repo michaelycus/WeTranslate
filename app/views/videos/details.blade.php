@@ -5,20 +5,14 @@
 @section('content')
 
 
-<?php	
-	preg_match("#(?<=v=)[a-zA-Z0-9-]+(?=&)|(?<=v\/)[^&\n]+(?=\?)|(?<=v=)[^&\n]+|(?<=youtu.be/)[^&\n]+#",  $video->original_link, $matches);
-
-	$json = json_decode(file_get_contents("http://gdata.youtube.com/feeds/api/videos/$matches[0]?v=2&alt=jsonc"));
-?>	
-
 <div class="profile-full-name">
-	<span class="text-semibold">{{ $json->data->title }}</span> 
+	<span class="text-semibold">{{ $video->title }}</span> 
 </div>
 	<div class="profile-row">
 	<div class="left-col">
 		<div class="profile-block">
 			<div class="panel video-detail-image">
-				{{ '<img src="' . $json->data->thumbnail->sqDefault . '">' }}
+				{{ '<img src="' . $video->thumbnail . '">' }}
 			</div><br>
 			
 		</div>
@@ -26,15 +20,9 @@
 		<div class="panel panel-transparent">
 			<div class="panel-heading">
 				<span class="panel-title"></span>
-			</div>
-
+			</div>			
 			<div class="tasks-panel">
-			</div>
-			<!-- <div class="list-group">
-				<a href="#" class="list-group-item"><img src="{{ URL::asset('assets/demo/avatars/1.jpg') }}" alt="" class="user-list"> Michael</a>
-				<a href="#" class="list-group-item"><img src="{{ URL::asset('assets/demo/avatars/3.jpg') }}" alt="" class="user-list"> Fulana</a>
-				<a href="#" class="list-group-item"><img src="{{ URL::asset('assets/demo/avatars/4.jpg') }}" alt="" class="user-list"> Siclano</a>
-			</div> -->
+			</div>			
 		</div>
 
 		<div class="panel panel-transparent">
@@ -44,7 +32,7 @@
 			<div class="list-group">
 				<a href="{{ $video->original_link }}" class="list-group-item"><i class="profile-list-icon fa fa-youtube-play" style="color: #e00022"></i> Original location</a>
 				<a href="{{ $video->working_link }}" class="list-group-item"><i class="profile-list-icon fa fa-rocket" style="color: #059418"></i> Working location</a>
-				<a href="#" class="list-group-item"><i class="profile-list-icon fa fa-clock-o" style="color: #4ab6d5"></i> {{ gmdate("H:i:s", $json->data->duration) }}</a>
+				<a href="#" class="list-group-item"><i class="profile-list-icon fa fa-clock-o" style="color: #4ab6d5"></i> {{ gmdate("H:i:s", $video->duration) }}</a>
 				<a href="#" class="list-group-item"><i class="profile-list-icon fa fa-calendar-o" style="color: #1a7ab9"></i> {{ date("d/m/Y", strtotime($video->created_at)) }}</a>
 			</div>
 		</div>
@@ -69,20 +57,6 @@
 				<div class="widget-article-comments tab-pane panel no-padding no-border fade in active" id="profile-tabs-board">
 
 					<div class="comment">
-						<!-- <img src="{{ URL::asset('assets/demo/avatars/1.jpg') }}" alt="" class="comment-avatar">
-						<div class="comment-body">
-							<form action="" id="leave-comment-form" class="comment-text no-padding no-border">
-								<textarea class="form-control" rows="1"></textarea>
-								<div class="expanding-input-hidden" style="margin-top: 10px;">
-									<label class="checkbox-inline pull-left">
-										<input type="checkbox" class="px">
-										<span class="lbl">Private message</span>
-									</label>
-									<button class="btn btn-primary pull-right">Leave Message</button>
-								</div>
-							</form>
-						</div> --> <!-- / .comment-body -->
-
 						<div id="disqus_thread"></div>
 						<script type="text/javascript">
 							/* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
@@ -213,9 +187,6 @@
 	$('.timeline').each(function(index, value){
 	    $(this).removeClass('page-profile');
 	});
-
-	
-
 
 </script>
 			

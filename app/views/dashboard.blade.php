@@ -120,7 +120,6 @@
 			</div>
 		</div>
 
-
 		<!-- Page wide horizontal line -->
 		<hr class="no-grid-gutter-h grid-gutter-margin-b no-margin-t">
 
@@ -150,9 +149,9 @@
 								<div class="thread">									
 									{{ '<img src="' . $video->thumbnail . '"  alt="" class="thread-avatar">' }}
 									<div class="thread-body">
-										<span class="thread-time">{{ time_elapsed_string($video->created_at) }}</span>
+										<span class="thread-time">{{ Helpers::time_elapsed_string($video->created_at) }}</span>
 										<a href="{{ URL::route('videos-details', $video->id) }}" class="thread-title">{{ $video->title }}</a>
-										<div class="thread-info">suggested by <a href="" title="">{{ $video->suggestedBy()['fullname'] }}</a></div>
+										<div class="thread-info">suggested by <a href="{{ URL::route('users-profile', $video->suggestedBy()['id']) }}" title="">{{ $video->suggestedBy()['fullname'] }}</a></div>
 									</div>
 								</div>
 								@endforeach
@@ -180,8 +179,8 @@
 								<div class="thread">
 									<img src="{{ $task->user->photo() }}" alt="" class="thread-avatar">
 									<div class="thread-body">
-										<span class="thread-time">{{ time_elapsed_string($task->created_at) }}</span>
-										<a href="#" title="">{{ $task->user->name }}</a> {{ $tasks_label[$task->type] }}										
+										<span class="thread-time">{{ Helpers::time_elapsed_string($task->created_at) }}</span>
+										<a href="{{ URL::route('users-profile', $task->user->id )}}" title="">{{ $task->user->firstname }}</a> {{ $tasks_label[$task->type] }}										
 										<div class="thread-info">the video <a href="{{ URL::route('videos-details', $task->video_id) }}" title="">{{ $task->video->title }}</a></div>
 									</div>
 								</div>
@@ -192,9 +191,7 @@
 					</div>
 				</div> <!-- / .widget-threads -->
 			</div>
-
 		</div>
-
 	</div>
 </div>	
 

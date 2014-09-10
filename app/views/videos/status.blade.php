@@ -18,7 +18,7 @@
 
 		<div class="panel colourable">
 			<div class="panel-heading">
-				<span class="panel-title">{{ $video->title }}</span>
+				<span class="panel-title"><a href="{{ URL::route('videos-details', $video->id) }}" target="_blank">{{ $video->title }}</a></span>
 				<div class="panel-heading-controls">
 					<!-- <span class="label label-tag label-warning">I need some assistence!</span> -->
 					<div class="btn-group btn-group-xs">
@@ -27,7 +27,7 @@
 							@foreach ($video_marks as $key => $mark)
 							<!-- <li><a href="{{ $key }}">{{ $mark }}</a></li> -->
 							@endforeach
-						</ul>						
+						</ul>			
 					</div>
 
 					@if (Auth::user()->auth >= USER_AUTH_ADMIN)
@@ -60,7 +60,7 @@
 						</li> <!-- / .list-group-item -->
 						<!-- Without left and right borders, without bottom border, extra small horizontal padding -->
 						<li class="list-group-item no-border-hr no-border-b padding-xs-hr">
-							47 comments <i class="fa  fa-comment pull-right"></i>
+							No comments <i class="fa  fa-comment pull-right"></i>
 						</li> <!-- / .list-group-item -->
 					</ul>					
 				</div>	

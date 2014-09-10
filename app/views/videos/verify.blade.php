@@ -50,6 +50,35 @@
 						<button type="button" class="close" data-dismiss="alert">×</button>
 						<strong>Ok!</strong> The original link is working fine.
 					</div>
+
+					<?php
+		 
+					// Create map with request parameters
+					$params = array('video_url' => $video->original_link);
+					 
+					// Build Http query using params
+					$query = http_build_query ($params);
+					 
+					// Create Http context details
+					$contextData = array ( 
+					                'method' => 'POST',
+					                'header' => "Content-Type: application/x-www-form-urlencoded\r\n".
+					                            "Content-Length: ".strlen($query)."\r\n",
+					                'content'=> $query );
+					 
+					// Create context resource for our request
+					$context = stream_context_create (array ( 'http' => $contextData ));
+					 
+					// Read page rendered as result of your POST request
+					$result =  file_get_contents (
+					                  'http://amara.org/pt/videos/create/',  // page url
+					                  false,
+					                  $context);		 
+
+					preg_match('/og:url.*content="(.*)"/', $result, $matches);
+
+					?>
+
 				@else
 					<div class="alert alert-danger alert-dark">
 						<button type="button" class="close" data-dismiss="alert">×</button>
@@ -70,7 +99,7 @@
 						<div class="row form-group">
 							<label class="col-sm-4 control-label">Working location:</label>
 							<div class="col-sm-8">
-								<input type="text" class="form-control" id="working_link" name="working_link" placeholder="http://..." value="{{ $video->working_link }}">
+								<input type="text" class="form-control" id="working_link" name="working_link" placeholder="http://..." value="{{{ $matches[1] or '' }}}">
 							</div>	
 							@if ($errors->has('working_link'))
 								<p class="help-block">{{ $errors->first('working_link') }}</p>
@@ -91,14 +120,13 @@
 			<div class="col-md-6">
 				<div class="panel colourable">
 					<div class="panel-heading">
-						<span class="panel-title"><i class="panel-title-icon fa fa-warning"></i>Suggested services</span>
+						<span class="panel-title"><i class="panel-title-icon fa fa-warning"></i>Suggested service</span>
 					</div>
 					<div class="panel-body">
-						We suggested to use <a href="http://www.amara.org" target="_blank">amara.org</a> and <a href="http://www.dotsub.com" target="_blank">dotsub.com</a> to translate your videos.
+						We suggested to use <a href="http://www.amara.org" target="_blank">amara.org</a> to translate your videos.
 					</div>
 					<div class="panel-footer">
-						<img src="{{ URL::asset('assets/images/amara.png') }}" width="100px"> 
-						<img src="{{ URL::asset('assets/images/dotsub.png') }}" width="100px">
+						<img src="{{ URL::asset('assets/images/amara.png') }}" width="100px"> 						
 					</div>
 				</div>
 			</div>

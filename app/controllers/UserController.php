@@ -2,30 +2,30 @@
 
 class UserController extends BaseController
 {
+	// public function user($id)
+	// {
+	// 	$user = User::where('id', '=', $id);
 
-	public function user($id)
-	{
-		$user = User::where('id', '=', $id);
+	// 	if ($user->count()){
+	// 		$user = $user->first();
 
-		if ($user->count()){
-			$user = $user->first();
+	// 		return View::make('users.user')
+	// 				->with('user', $user);
+	// 	}		
 
-			return View::make('profile.user')
-					->with('user', $user);
-		}		
-
-		return App::abort(404);
-	}
+	// 	return App::abort(404);
+	// }
 
 	public function getUser($id)
 	{
 		$user = User::where('id', '=', $id);
+		$tasks = Task::where('user_id', '=', $id)->orderBy('id', 'desc')->take(50)->get();
 
 		if ($user->count()){
 			$user = $user->first();
 
-			return View::make('profile.user')
-					->with('user', $user);
+			return View::make('users.user', array('user' => $user,
+												  'tasks' => $tasks));
 		}		
 
 		return App::abort(404);

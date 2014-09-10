@@ -7,10 +7,7 @@ class VideoController extends BaseController {
 		$videos = Video::where('status', '=', VIDEO_STATUS_TRANSLATING)->get();
 
 		foreach ($videos as $video) {
-			//$video->task = Task::whereRaw('video_id = '.$video->id.' and type = '. TASK_SUGGESTED_VIDEO)->first();
 			$video->tasks = Task::where('video_id', '=', $video->id)->orderBy('user_id')->get();
-
-
 		}
 
 		return View::make('videos.status', array('videos' => $videos,
@@ -175,8 +172,7 @@ class VideoController extends BaseController {
 						->with('success', 'Your suggestion was registered! Now it needs to be approved by the team.');
 			}
 		}
-	}
-	
+	}	
 
 	public function getTasks($video_id, $status)
 	{
@@ -200,7 +196,7 @@ class VideoController extends BaseController {
 			foreach ($user_task as $user_id => $type) {
 				$user = User::find($user_id);
 
-				$text .= '<img src="'. $user->photo().'" alt="" class="user-list">';
+				$text .= '<a href=" ' . URL::route('users-profile', $user->id) .'" target="_blank"><img src="'. $user->photo().'" alt="" class="user-list"></a>';
 
 				foreach ($type as $t) {
 					if ($t < TASK_REJECTED_VIDEO) // Don't need to present approved icon
@@ -250,7 +246,7 @@ class VideoController extends BaseController {
 
 				$text .= '<a href="#" class="list-group-item">';
 
-				$text .= '<img src="'. $user->photo().'" alt="" class="user-list"> ';
+				$text .= '<a href=" ' . URL::route('users-profile', $user->id) .'" target="_blank"><img src="'. $user->photo().'" alt="" class="user-list"></a> ';				
 				$text .= $user->name;
 
 				$text .= ' [ ';
@@ -267,14 +263,17 @@ class VideoController extends BaseController {
 
 			$text .= '</div>';
 
-			if ($is_helping)
+			if ($status < VIDEO_STATUS_FINISHED)
 			{
-				$text .= '<div class="text-center"><button class="btn btn-flat btn-sm btn-labeled btn-danger" onclick="setStopHelp('.$video_id.','.$status.')"><span class="btn-label icon fa fa-times-circle"></span>Stop helping!</button></div>';
-			}
-			else
-			{
-				$text .= '<div class="text-center"><button class="btn btn-flat btn-sm btn-labeled btn-success" onclick="setHelp('.$video_id.','.$status.')"><span class="btn-label icon fa fa-check-circle"></span>I want to help!</button></div>';	
-			}
+				if ($is_helping)
+				{
+					$text .= '<div class="text-center"><button class="btn btn-flat btn-sm btn-labeled btn-danger" onclick="setStopHelp('.$video_id.','.$status.')"><span class="btn-label icon fa fa-times-circle"></span>Stop helping!</button></div>';
+				}
+				else
+				{
+					$text .= '<div class="text-center"><button class="btn btn-flat btn-sm btn-labeled btn-success" onclick="setHelp('.$video_id.','.$status.')"><span class="btn-label icon fa fa-check-circle"></span>I want to help!</button></div>';	
+				}
+			}			
 
 			return $text;
 		}		
@@ -392,7 +391,7 @@ class VideoController extends BaseController {
 			$user = User::find($user_id);
 
 			$translated_videos 		= $user->translated_videos();
-			$sinchronized_videos 	= $user->sinchronized_videos();
+			$synchronized_videos 	= $user->synchronized_videos();
 			$proofreaded_videos 	= $user->proofreaded_videos();
 			$suggested_videos 		= $user->suggested_videos();
 			$opened_videos 			= $user->opened_videos();
@@ -413,7 +412,7 @@ class VideoController extends BaseController {
 				elseif ($t == TASK_IS_SYNCHRONIZING)
 				{
 					$score_total += round($duration_points * SCORE_SYNCHRONIZED / $synchronizing_task);
-					$sinchronized_videos++;
+					$synchronized_videos++;
 				}					
 				elseif ($t == TASK_IS_PROOFREADING)
 				{
@@ -424,125 +423,10 @@ class VideoController extends BaseController {
 
 			$worked_in_videos++;
 
-			$user->score = $translated_videos .','. $sinchronized_videos .','. $proofreaded_videos .','. 
+			$user->score = $translated_videos .','. $synchronized_videos .','. $proofreaded_videos .','. 
 			   			   $suggested_videos .','. $opened_videos .','. $worked_in_videos .','. $score_total;
 			
 			$user->save();
 		}
-	}
-
-	public function getTeste()
-	{
-		// //check if its our form
-  //       if ( Session::token() !== Input::get( '_token' ) ) {
-  //           return Response::json( array(
-  //               'msg' => 'Unauthorized attempt to create setting'
-  //           ) );
-  //       }
- 
-  //       $setting_name = Input::get( 'setting_name' );
-  //       $setting_value = Input::get( 'setting_value' );
- 
-  //       //.....
-  //       //validate data
-  //       //and then store it in DB
-  //       //.....
- 
-  //       $response = array(
-  //           'status' => 'success',
-  //           'msg' => 'Setting created successfully',
-  //       );
- 
-  //       return Response::json( $response );
-
-		// $videos = Video::all();
-
-		// foreach ($videos as $video) {
-
-		// 	preg_match("#(?<=v=)[a-zA-Z0-9-]+(?=&)|(?<=v\/)[^&\n]+(?=\?)|(?<=v=)[^&\n]+|(?<=youtu.be/)[^&\n]+#",  $video->original_link, $matches);
-
-		// 	$json = json_decode(file_get_contents("http://gdata.youtube.com/feeds/api/videos/$matches[0]?v=2&alt=jsonc"));
-
-  //           $video->title 			= $json->data->title;
-		// 	$video->duration 		= $json->data->duration;
-		// 	$video->thumbnail 		= $json->data->thumbnail->sqDefault;				
-
-		// 	$video->save();
-
-		// 	echo $video->title. '<br>';
-		// }
-
-		// $vimeo = 'https://vimeo.com/29474908';
-
-		// echo (int) substr(parse_url($vimeo, PHP_URL_PATH), 1);
-
-		// $s = 'https://www.youtube.com/watch?v=hqmzsf-AodM';
-
-		// if (strpos($s,'vimeo') !== false) {
-		//     echo 'vimeo';
-		// }
-		// elseif (strpos($s,'youtu') !== false) {
-		// 	echo 'youtube';
-		// }
-
-		// $imgid = 6271487;
-
-		// $hash = unserialize(file_get_contents("http://vimeo.com/api/v2/video/$imgid.php"));
-
-		// echo $hash[0]['thumbnail_medium']; 
-
-
-  //       $value = 'https://vimeo.com/100415419d';
-
-		// $video_id = (int) substr(parse_url($value, PHP_URL_PATH), 1);
-
-		// try
-		// {
-		// 	$hash = unserialize(file_get_contents("http://vimeo.com/api/v2/video/$video_id.php"));
-
-		// 	if ($hash)
-		// 	{
-		// 		echo $hash[0]['thumbnail_medium']; ;
-		// 	}
-		// 	else
-		// 	{
-		// 		echo 'erro';
-		// 	}
-		// }
-		// catch (\Exception $e)
-		// {
-		// 	echo 'errou';
-		// }	
-
-
-		$oembed_endpoint = 'http://vimeo.com/api/oembed';
-
-		// Grab the video url from the url, or use default
-		$video_url = 'http://vimeo.com/7100569';
-
-		// Create the URLs
-		$json_url = $oembed_endpoint . '.json?url=' . rawurlencode($video_url) . '&width=640';		
-
-		// Curl helper function
-		function curl_get($json_url) {
-		    $curl = curl_init($json_url);
-		    curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-		    curl_setopt($curl, CURLOPT_TIMEOUT, 30);
-		    curl_setopt($curl, CURLOPT_FOLLOWLOCATION, 1);
-		    $return = curl_exec($curl);
-		    curl_close($curl);
-		    return $return;
-		}
-
-		// Load in the oEmbed XML
-		$oembed = json_decode(curl_get($json_url));
-
-		var_dump($oembed);
-
-		
-
-
-
-		// return 'teste fudido';
 	}
 }

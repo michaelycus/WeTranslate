@@ -23,7 +23,7 @@ class User extends Eloquent implements UserInterface, RemindableInterface {
 	 */
 	protected $hidden = array('password', 'remember_token');
 
-	protected $fillable = array('email', 'name', 'fullname', 'password', 'password_temp', 'code', 'auth');
+	protected $fillable = array('email', 'firstname', 'lastname', 'password', 'password_temp', 'code', 'auth');
 
 	public function profiles()
     {
@@ -45,7 +45,7 @@ class User extends Eloquent implements UserInterface, RemindableInterface {
     	return (int)$this->score()[USER_SCORE_TRANSLATED];
     }
 
-    public function sinchronized_videos()
+    public function synchronized_videos()
     {
     	return (int)$this->score()[USER_SCORE_SYNCHRONIZED];
     }

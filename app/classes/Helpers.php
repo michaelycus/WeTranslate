@@ -1,12 +1,10 @@
 <?php
 class Helpers {
-    public static function doMessage() {
-        $message = 'Hello';
-        return $message;
-    }
 
-
-    function time_elapsed_string($datetime, $full = false) 
+	/*
+	| Returns the an estimated time elapsed 
+	*/
+    public static function time_elapsed_string($datetime, $full = false) 
 	{
 	    $now = new DateTime;
 	    $ago = new DateTime($datetime);
@@ -36,7 +34,10 @@ class Helpers {
 	    return $string ? implode(', ', $string) . ' ago' : 'just now';
 	}
 
-	function format_json($json, $html = false, $tabspaces = null)
+	/*
+	| Formats json in a pretty way
+	*/
+	public static function format_json($json, $html = false, $tabspaces = null)
 	{
 	    $tabcount = 0;
 	    $result = '';

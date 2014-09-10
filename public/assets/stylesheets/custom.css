@@ -28,3 +28,9 @@ img.thumbnail_video {
 img.logo_videos {
    width: 100px;
 }
+img.official_logo {
+   width: 200px;
+}
+img.official_icon {
+   width: 40px;
+}

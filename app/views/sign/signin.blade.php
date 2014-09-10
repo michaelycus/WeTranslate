@@ -18,6 +18,7 @@
 	<link href="{{ URL::asset('assets/stylesheets/pages.min.css') }}" rel="stylesheet" type="text/css">
 	<link href="{{ URL::asset('assets/stylesheets/rtl.min.css') }}" rel="stylesheet" type="text/css">
 	<link href="{{ URL::asset('assets/stylesheets/themes.min.css') }}" rel="stylesheet" type="text/css">
+	<link href="{{ URL::asset('assets/stylesheets/custom.css') }}" rel="stylesheet" type="text/css">
 
 	<!--[if lt IE 9]>
 		<script src="assets/javascripts/ie.min.js"></script>
@@ -47,10 +48,11 @@
 -->
 	<div class="signin-header">
 		<a href="index.html" class="logo">
-			<div class="demo-logo bg-primary"><img src="{{ URL::asset('assets/demo/logo-big.png') }}" alt="" style="margin-top: -4px;"></div>&nbsp;
-			<strong>We</strong>Translate
+			<div class="demo-logo bg-primary"><img src="{{ URL::asset('assets/demo/logo-big.png') }}" alt="" style="margin-top: -4px;"></div>&nbsp;			
+			<img src="{{ URL::asset('assets/images/logo.png') }}" alt="" class="official_logo">
+			<!-- <strong>We</strong>Translate -->
 		</a> <!-- / .logo -->
-		<a href="{{ URL::route('signup') }}" class="btn btn-primary">Sign Up</a>
+		<a href="{{ URL::route('account-sign-up') }}" class="btn btn-primary">Sign Up</a>
 	</div> <!-- / .header -->
 
 	@if (Session::has('account-actived'))
@@ -66,7 +68,7 @@
 	<!-- Form -->
 	<form action="{{ URL::route('account-sign-in-post') }}" id="signin-form_id" class="panel" method="post">
 
-		 @if (Session::has('global'))
+		@if (Session::has('global'))
 			<p class="help-block">{{ Session::get('global') }}</p>	        
 	    @endif
 
