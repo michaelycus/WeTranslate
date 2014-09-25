@@ -24,6 +24,12 @@
 	<link href="{{ URL::asset('assets/stylesheets/themes.min.css') }}" rel="stylesheet" type="text/css">
 	<link href="{{ URL::asset('assets/stylesheets/custom.css') }}" rel="stylesheet" type="text/css">
 
+	<script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.8/angular.min.js"></script>
+
+	<script src="{{ URL::asset('angularjs/controllers/mainCtrl.js') }}"></script>
+	<script src="{{ URL::asset('angularjs/services/commentService.js') }}"></script>
+	<script src="{{ URL::asset('angularjs/app.js') }}"></script>
+
 	<!--[if lt IE 9]>
 		<script src="assets/javascripts/ie.min.js"></script>
 	<![endif]-->
@@ -32,7 +38,7 @@
 <body class="theme-default main-menu-animated {{ $theme or '' }}">
 
 <script>var init = [];</script>
-<!-- Demo script --> <script src="{{ URL::asset('assets/demo/demo.js') }}"></script> <!-- / Demo script -->
+
 
 <div id="main-wrapper">
 
@@ -60,16 +66,19 @@
 
 					<div class="right clearfix">
 						<ul class="nav navbar-nav pull-right right-navbar-nav">
-<!-- /3. $END_NAVBAR_ICON_BUTTONS -->
+							<!-- /3. $END_NAVBAR_ICON_BUTTONS -->
 
 							<li class="dropdown">
 								<a href="#" class="dropdown-toggle user-menu" data-toggle="dropdown">
 									<img src="{{ Auth::user()->photo(); }}" alt="">
-									<span>{{ Auth::user()->name }}</span>
+									<span>{{ Auth::user()->firstname }}</span>
 								</a>
 								<ul class="dropdown-menu"> 
-									<li><a href="{{ URL::route('users-profile', Auth::id()) }}"><i class="dropdown-icon fa fa-user"></i>&nbsp;&nbsp;Profile</a></li>									
-									<li><a href="{{ URL::route('users-manage') }}"><i class="dropdown-icon fa fa-users"></i>&nbsp;&nbsp;Manage users</a></li>
+									<li><a href="{{ URL::route('users-profile', Auth::id()) }}">Profile</a></li>
+									@if (Auth::user()->auth >= USER_AUTH_ADMIN)
+									<li><a href="{{ URL::route('users-manage') }}">Manage users</a></li>
+									@endif
+									<li><a href="{{ URL::route('about') }}">About</a></li>
 									<li class="divider"></li>
 									<li><a href="{{ URL::route('account-sign-out') }}"><i class="dropdown-icon fa fa-power-off"></i>&nbsp;&nbsp;Log Out</a></li>
 								</ul>
@@ -91,7 +100,7 @@
 					 Javascript: html/assets/demo/demo.js
 				 -->
 				<div>
-					<div class="text-bg"><span class="text-slim">Hello,</span> <span class="text-semibold">{{ Auth::user()->name; }}</span></div>
+					<div class="text-bg"><span class="text-slim">Hello,</span> <span class="text-semibold">{{ Auth::user()->firstname; }}</span></div>
 
 					<img src="{{ Auth::user()->photo(); }}" alt="" class="">
 					<div class="btn-group">						
@@ -156,9 +165,12 @@
 <![endif]-->
 
 
+
 <!-- Pixel Admin's javascripts -->
 <script src="{{ URL::asset('assets/javascripts/bootstrap.min.js') }}"></script>
 <script src="{{ URL::asset('assets/javascripts/pixel-admin.min.js') }}"></script>
+
+
 
 @yield('script')
 

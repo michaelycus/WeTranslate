@@ -130,13 +130,6 @@ class AccountController extends BaseController{
 		return Redirect::route('home');
 	}
 
-	// public function getCreate()
-	// {
-	// 	return View::make('account.create');
-	// }
-
-	
-
 	public function getActivate($code){
 		$user = User::where('code', '=', $code)->where('auth', '=', USER_NOT_AUTHORIZED);
 
@@ -196,5 +189,10 @@ class AccountController extends BaseController{
 
 		return Redirect::route('account-change-password')
 				->with('global', 'Your password could not be changed.');
+	}
+
+	public function about()
+	{
+		return View::make('about');
 	}
 }

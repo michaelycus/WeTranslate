@@ -101,6 +101,7 @@
 
 @endforeach 
 
+
 @stop
 
 @section('script')
@@ -124,7 +125,7 @@
 	}	
 
 	function setHelp(video_id, status)
-	{		
+	{
 		var url = '<?php echo URL::to('/'); ?>' + '/videos/help/' + video_id + '/' + status;
 		$.get(url, function(data) {
            refresh_videos();
@@ -202,6 +203,12 @@
 	}
 
 	refresh_videos();
+
+	init.push(function () {
+		$('a').tooltip();
+	});
+
+	window.PixelAdmin.start(init);
 
 </script>
 			

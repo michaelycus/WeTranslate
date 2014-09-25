@@ -25,6 +25,9 @@ img.user-list  {
 img.thumbnail_video {
    width: 120px;
 }
+img.detail_video_img {
+   width: 150px;
+}
 img.logo_videos {
    width: 100px;
 }

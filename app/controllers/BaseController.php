@@ -13,6 +13,10 @@ class BaseController extends Controller {
 		{
 			$this->layout = View::make($this->layout);
 		}
+
+		// if (Input::has('fields')) {
+  //           $this->fields = Input::get('fields');
+  //       }
 	}
 
 }

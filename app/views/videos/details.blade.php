@@ -4,6 +4,9 @@
 
 @section('content')
 
+<script>
+	var init_video_id = {{ $video->id }};
+</script>
 
 <div class="profile-full-name">
 	<span class="text-semibold">{{ $video->title }}</span> 
@@ -12,7 +15,7 @@
 	<div class="left-col">
 		<div class="profile-block">
 			<div class="panel video-detail-image">
-				{{ '<img src="' . $video->thumbnail . '">' }}
+				{{ '<img src="' . $video->thumbnail . '" class="detail_video_img">' }}
 			</div><br>
 			
 		</div>
@@ -57,24 +60,50 @@
 				<div class="widget-article-comments tab-pane panel no-padding no-border fade in active" id="profile-tabs-board">
 
 					<div class="comment">
-						<div id="disqus_thread"></div>
-						<script type="text/javascript">
-							/* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
-							var disqus_shortname = 'wetranslate'; // required: replace example with your forum shortname
+						<div ng-app="commentApp" ng-controller="videoCommentController">
 
-							/* * * DON'T EDIT BELOW THIS LINE * * */
-							(function() {
-							var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-							dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
-							(document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-							})();
-						</script>
-						<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
-						<a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>						    
+							<div class="comment">
+								<img src="{{ Auth::user()->photo() }}" alt="" class="comment-avatar">
+								<div class="comment-body">
+									<form id="leave-comment-form" class="comment-text no-padding no-border" ng-init="commentData.video_id={{ $video->id }}" ng-submit="submitComment()">
+										<textarea class="form-control" rows="1" ng-model="commentData.text"></textarea>
+										<div class="expanding-input-hidden" style="margin-top: 10px;">
+											<label class="checkbox-inline pull-left">
+												<input type="checkbox" class="px">													
+											</label>
+											<button type="submit" class="btn btn-primary pull-right">Leave Message</button>
+										</div>
+									</form>
+								</div> <!-- / .comment-body -->
+							</div>
+
+							<hr class="no-panel-padding-h panel-wide">
+
+							<!-- LOADING ICON =============================================== -->
+							<!-- show loading icon if the loading variable is set to true -->
+
+							<p class="text-center" ng-show="loading"><span class="fa fa-refresh fa-5x fa-spin"></span></p>
+
+							<div class="comment" ng-hide="loading" ng-repeat="comment in comments">
+								<img src="@{{ comment.user.photo }}" alt="" class="comment-avatar">
+								<div class="comment-body">
+									<div class="comment-text">
+										<div class="comment-heading">
+											<a href="#" title="">@{{ comment.user.firstname + ' ' + comment.user.lastname  }}</a><span>@{{ comment.created_at | date:'medium' }}</span>
+										</div>
+										@{{ comment.text }}
+									</div>
+									<div class="comment-footer">										
+										<a href="#" ng-show="showComment(comment, {{ Auth::id() }})" ng-click="deleteComment(comment.id)" class="text-muted"><i class="fa fa-trash-o"></i> Remove</a>
+									</div>
+								</div> <!-- / .comment-body -->
+							</div>			
+
+						</div>						
 
 					</div>
 
-					<hr class="no-panel-padding-h panel-wide">
+					<!-- <hr class="no-panel-padding-h panel-wide"> -->
 
 				</div> <!-- / .tab-pane -->
 
@@ -118,7 +147,7 @@
 
 							<div class="panel tl-body">			
 							    <img src="{{ $task->user->photo() }}" alt="" class="rounded" style=" width: 20px;height: 20px;margin-top: -2px;">					
-								{{ $task->user->name . ' ' . $tasks_label[$task->type] }}
+								{{ $task->user->firstname . ' ' . $tasks_label[$task->type] }}
 							</div>
 						</div>
 
@@ -131,7 +160,6 @@
 		</div>
 	</div>
 </div>
-
 
 @stop
 
@@ -150,7 +178,6 @@
 			}
 		});
 	})
-	window.PixelAdmin.start(init);
 
 	function refresh_videos()
 	{
@@ -187,6 +214,12 @@
 	$('.timeline').each(function(index, value){
 	    $(this).removeClass('page-profile');
 	});
+
+	init.push(function () {
+		$('a').tooltip();
+	});
+
+	window.PixelAdmin.start(init);
 
 </script>
 			

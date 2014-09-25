@@ -25,23 +25,29 @@
 						}
 					}
 					elseif (strpos($video->original_link,'vimeo') !== false) {
-					    $oembed_endpoint = 'http://vimeo.com/api/oembed';
 
-						// Create the URLs
-						$json_url = $oembed_endpoint . '.json?url=' . rawurlencode($video->original_link) . '&width=640';		
+						$video_id =  substr(parse_url($video->original_link, PHP_URL_PATH), 1);
 
-						// Curl helper function
-						function curl_get($json_url) {
-						    $curl = curl_init($json_url);
-						    curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-						    curl_setopt($curl, CURLOPT_TIMEOUT, 30);
-						    curl_setopt($curl, CURLOPT_FOLLOWLOCATION, 1);
-						    $return = curl_exec($curl);
-						    curl_close($curl);
-						    return $return;
-						}
+						$json_data = file_get_contents("http://vimeo.com/api/v2/video/".$video_id.'.json');
+						$json = json_decode($json_data);
+
+					 //    $oembed_endpoint = 'http://vimeo.com/api/oembed';
+
+						// // Create the URLs
+						// $json_url = $oembed_endpoint . '.json?url=' . rawurlencode($video->original_link) . '&width=640';		
+
+						// // Curl helper function
+						// function curl_get($json_url) {
+						//     $curl = curl_init($json_url);
+						//     curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+						//     curl_setopt($curl, CURLOPT_TIMEOUT, 30);
+						//     curl_setopt($curl, CURLOPT_FOLLOWLOCATION, 1);
+						//     $return = curl_exec($curl);
+						//     curl_close($curl);
+						//     return $return;
+						// }
 						
-						$json = json_decode(curl_get($json_url));
+						// $json = json_decode(curl_get($json_url));
 					}					
 				?>					
 

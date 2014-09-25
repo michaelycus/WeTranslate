@@ -58,6 +58,11 @@ Route::group(array('before' => 'auth'), function(){
 	/*
 	| VIDEOS - Status
 	*/
+
+
+
+	//Route::resource('videos', 'VideoController');
+
 	Route::get('/videos/translating', array(
 		'as' => 'videos-translating',
 		'uses' => 'VideoController@getTranslating'
@@ -126,6 +131,11 @@ Route::group(array('before' => 'auth'), function(){
 		'uses' => 'VideoController@getReturnTo'
 	));
 
+	Route::post('/videos/suggestion', array(
+		'as' => 'videos-suggestion',
+		'uses' => 'VideoController@postSuggestion'
+	));
+
  	/*
 	| VIDEOS - Suggest, verify, approve
 	*/	
@@ -161,12 +171,34 @@ Route::group(array('before' => 'auth'), function(){
 	));
 
 	/*
+	| COMMENTS
+	*/
+	Route::group(array('prefix' => 'api'), function() {
+
+		// since we will be using this just for CRUD, we won't need create and edit
+		// Angular will handle both of those forms
+		// this ensures that a user can't access api/create or api/edit when there's nothing there
+		Route::resource('comments', 'CommentController', 
+			array('only' => array('index', 'store', 'destroy')));
+
+		Route::resource('videos.comments', 'VideoCommentController');
+	});
+
+	/*
 	| USERS
 	*/
 	Route::get('/users/{id}', array(
 		'as' => 'users-profile',
 		'uses' => 'UserController@getUser'
-	));	
+	));
+
+	/*
+	| ABOUT
+	*/
+	Route::get('about', array(
+		'as' => 'about',
+		'uses' => 'AccountController@about'
+	));
 
 	/*
 	| TEST
@@ -253,13 +285,26 @@ Route::group(array('before' => 'guest'), function(){
 	    $me = $facebook->api('/me');
 
 	    $profile = Profile::whereUid($uid)->first();
-	    if (empty($profile)) {
-	        $user = new User;
-	        $user->name = $me['first_name'];
-	        $user->fullname = $me['first_name'].' '.$me['last_name'];
-	        $user->username = $me['id'];
-	        $user->email = $me['email'];
-	        $user->photo = 'https://graph.facebook.com/'.$me['id'].'/picture?type=large';
+	    if (empty($profile)) 
+	    {
+	    	$user = User::where('email', '=', $me['email']);
+
+	    	if ($user->count())
+	    	{
+	    		$user = $user->first();
+
+	    		$user->firstname = $me['first_name'];
+		        $user->lastname  = $me['last_name'];
+		        $user->photo     = 'https://graph.facebook.com/'.$me['id'].'/picture?type=large';
+	    	}
+	    	else
+	    	{
+	    		$user = new User;
+		        $user->firstname = $me['first_name'];
+		        $user->lastname  = $me['last_name'];	        
+		        $user->email     = $me['email'];
+		        $user->photo     = 'https://graph.facebook.com/'.$me['id'].'/picture?type=large';
+	    	}
 
 	        $user->save();
 

@@ -3,7 +3,7 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateVideosTasksTable extends Migration {
+class CreateCommentsTable extends Migration {
 
 	/**
 	 * Run the migrations.
@@ -12,12 +12,14 @@ class CreateVideosTasksTable extends Migration {
 	 */
 	public function up()
 	{
-		Schema::create('videos_tasks', function(Blueprint $table)
+		Schema::create('comments', function(Blueprint $table)
 		{
 			$table->increments('id');
 
+			$table->string('text');
 			$table->integer('video_id');
-			$table->integer('task_id');
+			$table->integer('user_id');
+			$table->integer('reply_to');
 
 			$table->timestamps();
 		});
@@ -30,7 +32,8 @@ class CreateVideosTasksTable extends Migration {
 	 */
 	public function down()
 	{
-		Schema::drop('videos_tasks');
+		Schema::drop('comments');
 	}
 
 }
+

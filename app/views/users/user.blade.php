@@ -85,7 +85,7 @@
 
 								<div class="panel tl-body">			
 								    <img src="{{ $task->user->photo() }}" alt="" class="rounded" style=" width: 20px;height: 20px;margin-top: -2px;">					 
-									{{ $task->user->name . ' ' . $tasks_label[$task->type] }}
+									{{ $task->user->firstname . ' ' . $tasks_label[$task->type] }}
 									@if ($task->video)
 									the video <a href="{{ URL::route('videos-details', $task->video_id) }}">{{ $task->video->title }} </a> 
 									@else

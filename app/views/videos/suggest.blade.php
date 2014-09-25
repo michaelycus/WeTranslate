@@ -33,7 +33,7 @@
 							valid_video_url: true
 						}
 					}
-				});		
+				});
 			});
 		</script>
 

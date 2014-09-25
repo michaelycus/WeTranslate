@@ -82,3 +82,33 @@ require app_path().'/filters.php';
 
 // load constants - Michael
 require app_path().'/config/constants.php';
+
+/**
+ * Generate a querystring url for the application.
+ *
+ * Assumes that you want a URL with a querystring rather than route params
+ * (which is what the default url() helper does)
+ *
+ * Example:
+ *
+ * $url = qs_url('sign-in', array('email'=>$user->email));
+ * //http://example.loc/sign-in?email=chris%40foobar.com
+ *
+ *
+ * @param  string  $path
+ * @param  mixed   $qs
+ * @param  bool    $secure
+ * @return string
+ */
+// function qs_url($path = null, $qs = array(), $secure = null)
+// {
+//     $url = app('url')->to($path, $secure);
+//     if (count($qs)){
+
+//         foreach($qs as $key => $value){
+//             $qs[$key] = sprintf('%s=%s',$key, urlencode($value));
+//         }
+//         $url = sprintf('%s?%s', $url, implode('&', $qs));
+//     }
+//     return $url;
+// }

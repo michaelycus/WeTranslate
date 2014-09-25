@@ -88,25 +88,34 @@ class VideoController extends BaseController {
 				$video->thumbnail 		= $json->data->thumbnail->sqDefault;
 			}
 			elseif (strpos($video->original_link,'vimeo') !== false) {
-				$oembed_endpoint = 'http://vimeo.com/api/oembed';
+			
 
-				$json_url = $oembed_endpoint . '.json?url=' . rawurlencode($video->original_link) . '&width=640';		
+							// $video_id =  substr(parse_url($video->original_link, PHP_URL_PATH), 1);
 
-				function curl_get($json_url) {
-				    $curl = curl_init($json_url);
-				    curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-				    curl_setopt($curl, CURLOPT_TIMEOUT, 30);
-				    curl_setopt($curl, CURLOPT_FOLLOWLOCATION, 1);
-				    $return = curl_exec($curl);
-				    curl_close($curl);
-				    return $return;
-				}
+							// $json_data = file_get_contents("http://vimeo.com/api/v2/video/".$video_id.'.json');
+							// $json = json_decode($json_data);
+				// $oembed_endpoint = 'http://vimeo.com/api/oembed';
+
+				// $json_url = $oembed_endpoint . '.json?url=' . rawurlencode($video->original_link) . '&width=640';		
+
+				// function curl_get($json_url) {
+				//     $curl = curl_init($json_url);
+				//     curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+				//     curl_setopt($curl, CURLOPT_TIMEOUT, 30);
+				//     curl_setopt($curl, CURLOPT_FOLLOWLOCATION, 1);
+				//     $return = curl_exec($curl);
+				//     curl_close($curl);
+				//     return $return;
+				// }
 				
-				$json = json_decode(curl_get($json_url));
+				// $json = json_decode(curl_get($json_url));
 
-				$video->title 			= $json->title;
-				$video->duration 		= $json->duration;
-				$video->thumbnail 		= $json->thumbnail_url;
+				$video_id = substr(parse_url($video->original_link, PHP_URL_PATH), 1);
+            	$hash = json_decode(file_get_contents("http://vimeo.com/api/v2/video/{$video_id}.json"));
+
+				$video->title 			= $hash[0]->title;
+				$video->duration 		= $hash[0]->duration;
+				$video->thumbnail 		= $hash[0]->thumbnail_large;
 			}
 
 			$video->original_link 	= Input::get('original_link');
@@ -196,8 +205,8 @@ class VideoController extends BaseController {
 			foreach ($user_task as $user_id => $type) {
 				$user = User::find($user_id);
 
-				$text .= '<a href=" ' . URL::route('users-profile', $user->id) .'" target="_blank"><img src="'. $user->photo().'" alt="" class="user-list"></a>';
-
+				$text .= '<a href="' . URL::route('users-profile', $user->id) .'" target="_blank" data-toggle="tooltip" data-placement="top" data-original-title="  '. $user->firstname . ' ' . $user->lastname . '"><img src="'. $user->photo().'" alt="" class="user-list"></a>';
+				
 				foreach ($type as $t) {
 					if ($t < TASK_REJECTED_VIDEO) // Don't need to present approved icon
 						$text .= ' <i class="menu-icon fa '. $icons[$t] . ' text-primary"></i> ';
@@ -246,7 +255,7 @@ class VideoController extends BaseController {
 
 				$text .= '<a href="#" class="list-group-item">';
 
-				$text .= '<a href=" ' . URL::route('users-profile', $user->id) .'" target="_blank"><img src="'. $user->photo().'" alt="" class="user-list"></a> ';				
+				$text .= '<a href=" ' . URL::route('users-profile', $user->id) .'" target="_blank" data-toggle="tooltip" data-placement="top" data-original-title="  '. $user->firstname . ' ' . $user->lastname . '"><img src="'. $user->photo().'" alt="" class="user-list"></a> ';				
 				$text .= $user->name;
 
 				$text .= ' [ ';
@@ -353,6 +362,90 @@ class VideoController extends BaseController {
 			$video = Video::find($video_id);
 
 			$video->delete();
+		}
+	}
+
+	public function postSuggestion()
+	{
+		$value = " 1 ";
+		if (Request::ajax())
+		{
+			$video_url = Input::get('original_link');
+
+			$value .= " 2 ";
+
+			if (strpos($video_url,'youtu') !== false) {
+				preg_match("#(?<=v=)[a-zA-Z0-9-]+(?=&)|(?<=v\/)[^&\n]+(?=\?)|(?<=v=)[^&\n]+|(?<=youtu.be/)[^&\n]+#",  $video_url, $matches);
+
+				try{
+					$json = json_decode(file_get_contents("http://gdata.youtube.com/feeds/api/videos/$matches[0]?v=2&alt=jsonc"));
+
+					$video->title 			= $json->data->title;
+					$video->duration 		= $json->data->duration;
+					$video->thumbnail 		= $json->data->thumbnail->sqDefault;
+					
+				} catch (Exception $e){
+					$json = NULL;
+				}
+			}
+			elseif (strpos($video_url,'vimeo') !== false) {
+				$value .= " 3 ";
+				$video_id =  substr(parse_url($video_url, PHP_URL_PATH), 1);
+
+				$hash = json_decode(file_get_contents("http://vimeo.com/api/v2/video/{$video_id}.json"));
+
+				$video->title 			= $hash[0]->title;
+				$video->duration 		= $hash[0]->duration;
+				$video->thumbnail 		= $hash[0]->thumbnail_large;
+			}
+
+			if ($json)
+			{
+				$value .= " 4 ";
+				// Create map with request parameters
+				$params = array('video_url' => $video->original_link);
+				 
+				// Build Http query using params
+				$query = http_build_query ($params);
+				 
+				// Create Http context details
+				$contextData = array ( 
+				                'method' => 'POST',
+				                'header' => "Content-Type: application/x-www-form-urlencoded\r\n".
+				                            "Content-Length: ".strlen($query)."\r\n",
+				                'content'=> $query );
+				 
+				// Create context resource for our request
+				$context = stream_context_create (array ( 'http' => $contextData ));
+				 
+				// Read page rendered as result of your POST request
+				$result =  file_get_contents (
+				                  'http://amara.org/pt/videos/create/',  // page url
+				                  false,
+				                  $context);
+
+				preg_match('/og:url.*content="(.*)"/', $result, $matches);
+
+				$video->original_link = $video_url;
+				$video->working_link = $matches[1];
+				$video->status = VIDEO_STATUS_TRANSLATING;
+
+				$video = Video::create($video);
+
+				Task::create(array(
+					'type' => TASK_SUGGESTED_VIDEO,
+					'user_id' => Auth::id(),
+					'video_id' => $video->id
+				));
+
+				$value .= " 5 ";
+
+				// return Redirect::route('/')
+				// 		->with('success', 'Your suggestion is now avaliable for translation!');
+			}
+
+			return $value;
+
 		}
 	}
 
