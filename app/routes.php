@@ -1,17 +1,7 @@
 <?php
 
-/*
-|--------------------------------------------------------------------------
-| Application Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register all of the routes for an application.
-| It's a breeze. Simply tell Laravel the URIs it should respond to
-| and give it the Closure to execute when that URI is requested.
-|
-*/
 
-Route::get('/', array('as' => 'home', 'uses' => 'AccountController@getIndex'));//->before('auth ');
+Route::get('/', array('as' => 'home', 'uses' => 'AccountController@getIndex'));
 
 /*
 | Authenticated group
@@ -58,10 +48,6 @@ Route::group(array('before' => 'auth'), function(){
 	/*
 	| VIDEOS - Status
 	*/
-
-
-
-	//Route::resource('videos', 'VideoController');
 
 	Route::get('/videos/translating', array(
 		'as' => 'videos-translating',
@@ -131,44 +117,44 @@ Route::group(array('before' => 'auth'), function(){
 		'uses' => 'VideoController@getReturnTo'
 	));
 
-	Route::post('/videos/suggestion', array(
-		'as' => 'videos-suggestion',
-		'uses' => 'VideoController@postSuggestion'
-	));
+	 Route::post('/videos/suggestion', array(
+	 	'as' => 'videos-suggestion',
+	 	'uses' => 'VideoController@postSuggestion'
+	 ));
 
  	/*
 	| VIDEOS - Suggest, verify, approve
 	*/	
 
-	Route::get('/videos/suggest', array(
-		'as' => 'videos-suggest',
-		'uses' => 'VideoController@getSuggest'
-	));
+	// Route::get('/videos/suggest', array(
+	// 	'as' => 'videos-suggest',
+	// 	'uses' => 'VideoController@getSuggest'
+	// ));
 
-	Route::post('/videos/suggest', array(
-		'as' => 'videos-suggest-post',
-		'uses' => 'VideoController@postSuggest'
-	));
+	// Route::post('/videos/suggest', array(
+	// 	'as' => 'videos-suggest-post',
+	// 	'uses' => 'VideoController@postSuggest'
+	// ));
 
-	Route::get('/videos/verify/{id}', array(
-		'as' => 'videos-verify',
-		'uses' => 'VideoController@getVerify'
-	));
+	// Route::get('/videos/verify/{id}', array(
+	// 	'as' => 'videos-verify',
+	// 	'uses' => 'VideoController@getVerify'
+	// ));
 
-	Route::post('/videos/verify/{id}', array(
-		'as' => 'videos-verify-post',
-		'uses' => 'VideoController@postVerify'
-	));
+	// Route::post('/videos/verify/{id}', array(
+	// 	'as' => 'videos-verify-post',
+	// 	'uses' => 'VideoController@postVerify'
+	// ));
 
-	Route::get('/videos/for-approval', array(
-		'as' => 'videos-for-approval',
-		'uses' => 'VideoController@getForApproval'
-	));
+	// Route::get('/videos/for-approval', array(
+	// 	'as' => 'videos-for-approval',
+	// 	'uses' => 'VideoController@getForApproval'
+	// ));
 
-	Route::post('/videos/for-approval', array(
-		'as' => 'videos-for-approval-post',
-		'uses' => 'VideoController@postForApproval'
-	));
+	// Route::post('/videos/for-approval', array(
+	// 	'as' => 'videos-for-approval-post',
+	// 	'uses' => 'VideoController@postForApproval'
+	// ));
 
 	/*
 	| COMMENTS
@@ -253,7 +239,7 @@ Route::group(array('before' => 'guest'), function(){
 	*/	
 	Route::get('/account/sign-up', array(
 		'as' => 'account-sign-up',
-		'uses' => 'AccountController@getSignup'		
+		'uses' => 'AccountController@getSignUp'		
 	));	
 
 	Route::get('/account/activate/{code}', array(
@@ -323,10 +309,5 @@ Route::group(array('before' => 'guest'), function(){
 
 	    return Redirect::to('/')->with('message', 'Logged in with Facebook');
 	}));
-
-	Route::get('teste', function()
-	{
-	    return phpinfo();
-	});
 
 });

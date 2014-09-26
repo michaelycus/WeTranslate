@@ -16,8 +16,7 @@
 			<div class="col-xs-12 col-sm-8">
 				<div class="row">
 					<hr class="visible-xs no-grid-gutter-h">
-					<!-- "Create project" button, width=auto on desktops -->
-					<!-- <div class="pull-right col-xs-12 col-sm-auto"><a href="{{ URL::route('videos-suggest') }}" class="btn btn-primary btn-labeled" style="width: 100%;"><span class="btn-label icon fa fa-plus"></span>Suggest Video</a></div> -->
+					<!-- "Create project" button, width=auto on desktops -->					
 					<div class="pull-right col-xs-12 col-sm-auto"><a href="#" onclick="openSuggestionPanel()" class="btn btn-primary btn-labeled" style="width: 100%;"><span class="btn-label icon fa fa-plus"></span>Suggest Video</a></div>
 
 					<!-- Margin -->
@@ -31,9 +30,7 @@
 
 	<div class="row" id="suggestionPanel"  style="display: none;">
 		<div class="col-md-6">				
-		   <!-- <form id="jq-validation-form" class="panel form-horizontal" method="post" action="{{ URL::route('videos-suggest-post') }}"> -->
-		   
-		   <form id="suggestion-form">		   
+		   <div id="suggestion-form" class="panel form-horizontal"> 
 				<div class="panel-heading">
 					<span class="panel-title">Inform the url of the video</span>
 				</div>
@@ -48,12 +45,13 @@
 								@endif
 						</div>
 					</div>
+					<div id="processing"></div>
 				</div>
 
 				<div class="panel-footer text-right">
 					<button onclick="suggestVideo()" class="btn btn-primary">Suggest</button>
 				</div>
-			</form>			
+			</div>			
 
 			<!-- 	{{ Form::token() }}						
 				
@@ -280,7 +278,7 @@
 								<p class="text-center" ng-show="loading"><span class="fa fa-refresh fa-5x fa-spin"></span></p>
 
 								<div class="comment" ng-hide="loading" ng-repeat="comment in comments | limitTo: -10 | orderBy: 'id':true">
-									<img src="@{{ comment.user.photo }}" alt="" class="comment-avatar">
+									<img ng-src="@{{ comment.user.photo }}" alt="" class="comment-avatar">
 									<div class="comment-body">
 										<div class="comment-text">
 											<div class="comment-heading">
@@ -309,20 +307,19 @@
 @section('script')
 
 <script type="text/javascript">
-	//$('#suggestionPanel').hide();
 	function openSuggestionPanel(){
 		$('#suggestionPanel').toggle(200);
 	}
 
-	function suggestVideo(){
+function suggestVideo(){
 		var url = '<?php echo URL::to('/'); ?>' + '/videos/suggestion';		
 		var video_url = $('#original_link').val();
 
-		$.post( url, 
-			{ original_link: video_url})
-			.done(function( data ) {
-			alert( "Data Loaded: " + data );
-		});
+		$('#processing').append('Processing... <i class="fa fa-refresh fa-spin"></i>');
+		$.post( url, { original_link: video_url})
+			.done(function(data){				
+				window.location.reload(true);
+			});
 	}
 
 	init.push(function () {

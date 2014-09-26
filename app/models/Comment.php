@@ -7,4 +7,9 @@ class Comment extends Eloquent {
     {
         return $this->belongsTo('User');
     }
+
+    public function video()
+    {
+        return $this->belongsTo('Video');
+    }
 }

@@ -10,6 +10,8 @@
 	<h1><span class="text-light-gray">Videos / </span>{{ $status_label[$status] }}</h1>
 </div> <!-- / .page-header -->
 
+<?php Debugbar::info('teste'. $videos); ?>
+
 @foreach ($videos as $video)
 
 <div class="row" data-panel-id="{{ $video->id }}">
@@ -60,7 +62,7 @@
 						</li> <!-- / .list-group-item -->
 						<!-- Without left and right borders, without bottom border, extra small horizontal padding -->
 						<li class="list-group-item no-border-hr no-border-b padding-xs-hr">
-							No comments <i class="fa  fa-comment pull-right"></i>
+							{{ $video->comments()->count() }}  comments <i class="fa  fa-comment pull-right"></i>
 						</li> <!-- / .list-group-item -->
 					</ul>					
 				</div>	

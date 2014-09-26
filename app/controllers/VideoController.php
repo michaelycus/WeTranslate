@@ -38,21 +38,6 @@ class VideoController extends BaseController {
 		 									       'status' => VIDEO_STATUS_FINISHED));
 	}
 
-	public function getForApproval()
-	{
-		$videos = Video::where('status', '=', VIDEO_FOR_APPROVAL)->get();
-
-		return View::make('videos.for_approval', array('videos' => $videos,
-		 									           'status' => VIDEO_FOR_APPROVAL));
-	}	
-
-	public function getVerify($id)
-	{
-		$video = Video::find($id);
-
-		return View::make('videos.verify', array('video' => $video));
-	}
-
 	public function getDetails($id)
 	{
 		$video = Video::find($id);
@@ -60,127 +45,6 @@ class VideoController extends BaseController {
 
 		return View::make('videos.details', array('video' => $video,
 												  'tasks' => $tasks));
-	}
-
-	public function postVerify($id)
-	{
-		$validator = Validator::make(Input::all(), 
-			array(
-				'original_link' 	=> 'required|url|Video_url',
-				'working_link'  	=> 'required|url'
-			)
-		);
-
-		if ($validator->fails()) {
-			return Redirect::route('videos-verify', $id)
-					->withErrors($validator)
-					->withInput();
-		} else {
-			$video = Video::find($id);
-
-			if (strpos($video->original_link,'youtu') !== false) {
-				preg_match("#(?<=v=)[a-zA-Z0-9-]+(?=&)|(?<=v\/)[^&\n]+(?=\?)|(?<=v=)[^&\n]+|(?<=youtu.be/)[^&\n]+#",  Input::get('original_link'), $matches);
-
-				$json = json_decode(file_get_contents("http://gdata.youtube.com/feeds/api/videos/$matches[0]?v=2&alt=jsonc"));
-
-				$video->title 			= $json->data->title;
-				$video->duration 		= $json->data->duration;
-				$video->thumbnail 		= $json->data->thumbnail->sqDefault;
-			}
-			elseif (strpos($video->original_link,'vimeo') !== false) {
-			
-
-							// $video_id =  substr(parse_url($video->original_link, PHP_URL_PATH), 1);
-
-							// $json_data = file_get_contents("http://vimeo.com/api/v2/video/".$video_id.'.json');
-							// $json = json_decode($json_data);
-				// $oembed_endpoint = 'http://vimeo.com/api/oembed';
-
-				// $json_url = $oembed_endpoint . '.json?url=' . rawurlencode($video->original_link) . '&width=640';		
-
-				// function curl_get($json_url) {
-				//     $curl = curl_init($json_url);
-				//     curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-				//     curl_setopt($curl, CURLOPT_TIMEOUT, 30);
-				//     curl_setopt($curl, CURLOPT_FOLLOWLOCATION, 1);
-				//     $return = curl_exec($curl);
-				//     curl_close($curl);
-				//     return $return;
-				// }
-				
-				// $json = json_decode(curl_get($json_url));
-
-				$video_id = substr(parse_url($video->original_link, PHP_URL_PATH), 1);
-            	$hash = json_decode(file_get_contents("http://vimeo.com/api/v2/video/{$video_id}.json"));
-
-				$video->title 			= $hash[0]->title;
-				$video->duration 		= $hash[0]->duration;
-				$video->thumbnail 		= $hash[0]->thumbnail_large;
-			}
-
-			$video->original_link 	= Input::get('original_link');
-			$video->working_link 	= Input::get('working_link');
-			$video->status 		= VIDEO_STATUS_TRANSLATING;			
-
-			$video->save();
-
-			if ($video){
-				// Mail::send('emails.auth.activate', array('link' => URL::route('account-activate', $code) , 'name' => $name), function($message) use ($user){
- 			// 		$message->to($user->email, $user->name)->subject('Activate your account');
-				// });
-
-				Task::create(array(
-					'type' => TASK_APPROVED_VIDEO,
-					'user_id' => Auth::id(),
-					'video_id' => $video->id
-				));
-
-				return Redirect::route('videos-for-approval')
-						->with('success', 'The video is now opened for translations!');
-			}
-		}
-	}
-
-	public function getSuggest()
-	{
-		return View::make('videos.suggest');
-	}
-
-	public function postSuggest()
-	{
-		$validator = Validator::make(Input::all(), 
-			array(
-				'original_link' 	=> 'required|url|Video_url'
-			)
-		);
-
-		if ($validator->fails()) {
-			return Redirect::route('videos-suggest')
-					->withErrors($validator)
-					->withInput();
-		} else {
-			$original_link    = Input::get('original_link');
-
-			$video = Video::create(array(
-				'original_link'	=> $original_link,
-				'status'		=> VIDEO_FOR_APPROVAL
-			));
-
-			if ($video){
-				// Mail::send('emails.auth.activate', array('link' => URL::route('account-activate', $code) , 'name' => $name), function($message) use ($user){
- 			// 		$message->to($user->email, $user->name)->subject('Activate your account');
-				// });
-
-				Task::create(array(
-					'type' => TASK_SUGGESTED_VIDEO,
-					'user_id' => Auth::id(),
-					'video_id' => $video->id
-				));
-
-				return Redirect::route('videos-suggest')
-						->with('success', 'Your suggestion was registered! Now it needs to be approved by the team.');
-			}
-		}
 	}	
 
 	public function getTasks($video_id, $status)
@@ -367,12 +231,13 @@ class VideoController extends BaseController {
 
 	public function postSuggestion()
 	{
-		$value = " 1 ";
 		if (Request::ajax())
 		{
 			$video_url = Input::get('original_link');
 
-			$value .= " 2 ";
+			$video_title     = '';
+			$video_duration  = '';
+			$video_thumbnail = '';
 
 			if (strpos($video_url,'youtu') !== false) {
 				preg_match("#(?<=v=)[a-zA-Z0-9-]+(?=&)|(?<=v\/)[^&\n]+(?=\?)|(?<=v=)[^&\n]+|(?<=youtu.be/)[^&\n]+#",  $video_url, $matches);
@@ -380,30 +245,29 @@ class VideoController extends BaseController {
 				try{
 					$json = json_decode(file_get_contents("http://gdata.youtube.com/feeds/api/videos/$matches[0]?v=2&alt=jsonc"));
 
-					$video->title 			= $json->data->title;
-					$video->duration 		= $json->data->duration;
-					$video->thumbnail 		= $json->data->thumbnail->sqDefault;
-					
+					$video_title 			= $json->data->title;
+					$video_duration 		= $json->data->duration;
+					$video_thumbnail 		= $json->data->thumbnail->sqDefault;
+
 				} catch (Exception $e){
 					$json = NULL;
 				}
 			}
 			elseif (strpos($video_url,'vimeo') !== false) {
-				$value .= " 3 ";
 				$video_id =  substr(parse_url($video_url, PHP_URL_PATH), 1);
 
-				$hash = json_decode(file_get_contents("http://vimeo.com/api/v2/video/{$video_id}.json"));
-
-				$video->title 			= $hash[0]->title;
-				$video->duration 		= $hash[0]->duration;
-				$video->thumbnail 		= $hash[0]->thumbnail_large;
+				$json_data = file_get_contents("http://vimeo.com/api/v2/video/".$video_id.'.json');
+				$json = json_decode($json_data);
+						
+				$video_title			= $json[0]->title;
+				$video_duration 		= $json[0]->duration;
+				$video_thumbnail		= $json[0]->thumbnail_large;
 			}
 
 			if ($json)
 			{
-				$value .= " 4 ";
 				// Create map with request parameters
-				$params = array('video_url' => $video->original_link);
+				$params = array('video_url' => $video_url);
 				 
 				// Build Http query using params
 				$query = http_build_query ($params);
@@ -425,12 +289,15 @@ class VideoController extends BaseController {
 				                  $context);
 
 				preg_match('/og:url.*content="(.*)"/', $result, $matches);
-
-				$video->original_link = $video_url;
-				$video->working_link = $matches[1];
-				$video->status = VIDEO_STATUS_TRANSLATING;
-
-				$video = Video::create($video);
+				
+				$video = Video::create(array(
+					'title' 		=> $video_title,
+					'duration' 		=> $video_duration,
+					'thumbnail' 	=> $video_thumbnail,
+					'original_link' => $video_url,
+					'working_link' 	=> $matches[1],
+					'status' 		=> VIDEO_STATUS_TRANSLATING
+				));
 
 				Task::create(array(
 					'type' => TASK_SUGGESTED_VIDEO,
@@ -438,15 +305,11 @@ class VideoController extends BaseController {
 					'video_id' => $video->id
 				));
 
-				$value .= " 5 ";
-
-				// return Redirect::route('/')
-				// 		->with('success', 'Your suggestion is now avaliable for translation!');
+			  Session::flash('success', 'Your suggestion is now avaliable for translation!');
+			  	
 			}
-
-			return $value;
-
 		}
+		Session::flash('fail', 'Oh span! Something went wrong. Check your link and try again later!');
 	}
 
 	private function addScore($video_id)
@@ -522,4 +385,120 @@ class VideoController extends BaseController {
 			$user->save();
 		}
 	}
+
+	// public function getForApproval()
+	// {
+	// 	$videos = Video::where('status', '=', VIDEO_FOR_APPROVAL)->get();
+
+	// 	return View::make('videos.for_approval', array('videos' => $videos,
+	// 	 									           'status' => VIDEO_FOR_APPROVAL));
+	// }	
+	
+	// public function postForApproval()
+	// {
+	// }
+
+	// public function getVerify($id)
+	// {
+	// 	$video = Video::find($id);
+
+	// 	return View::make('videos.verify', array('video' => $video));
+	// }
+
+	// public function postVerify($id)
+	// {
+	// 	$validator = Validator::make(Input::all(), 
+	// 		array(
+	// 			'original_link' 	=> 'required|url|Video_url',
+	// 			'working_link'  	=> 'required|url'
+	// 		)
+	// 	);
+
+	// 	if ($validator->fails()) {
+	// 		return Redirect::route('videos-verify', $id)
+	// 				->withErrors($validator)
+	// 				->withInput();
+	// 	} else {
+	// 		$video = Video::find($id);
+
+	// 		if (strpos($video->original_link,'youtu') !== false) {
+	// 			preg_match("#(?<=v=)[a-zA-Z0-9-]+(?=&)|(?<=v\/)[^&\n]+(?=\?)|(?<=v=)[^&\n]+|(?<=youtu.be/)[^&\n]+#",  Input::get('original_link'), $matches);
+
+	// 			$json = json_decode(file_get_contents("http://gdata.youtube.com/feeds/api/videos/$matches[0]?v=2&alt=jsonc"));
+
+	// 			$video->title 			= $json->data->title;
+	// 			$video->duration 		= $json->data->duration;
+	// 			$video->thumbnail 		= $json->data->thumbnail->sqDefault;
+	// 		}
+	// 		elseif (strpos($video->original_link,'vimeo') !== false) {	
+
+
+	// 			$video_id = substr(parse_url($video->original_link, PHP_URL_PATH), 1);
+ //            	$hash = json_decode(file_get_contents("http://vimeo.com/api/v2/video/{$video_id}.json"));
+
+	// 			$video->title 			= $hash[0]->title;
+	// 			$video->duration 		= $hash[0]->duration;
+	// 			$video->thumbnail 		= $hash[0]->thumbnail_large;
+	// 		}
+
+	// 		$video->original_link 	= Input::get('original_link');
+	// 		$video->working_link 	= Input::get('working_link');
+	// 		$video->status 		= VIDEO_STATUS_TRANSLATING;			
+
+	// 		$video->save();
+
+	// 		if ($video){
+	// 			Task::create(array(
+	// 				'type' => TASK_APPROVED_VIDEO,
+	// 				'user_id' => Auth::id(),
+	// 				'video_id' => $video->id
+	// 			));
+
+	// 			return Redirect::route('videos-for-approval')
+	// 					->with('success', 'The video is now opened for translations!');
+	// 		}
+	// 	}
+	// }
+
+	// public function getSuggest()
+	// {
+	// 	return View::make('videos.suggest');
+	// }
+
+	// public function postSuggest()
+	// {
+	// 	$validator = Validator::make(Input::all(), 
+	// 		array(
+	// 			'original_link' 	=> 'required|url|Video_url'
+	// 		)
+	// 	);
+
+	// 	if ($validator->fails()) {
+	// 		return Redirect::route('videos-suggest')
+	// 				->withErrors($validator)
+	// 				->withInput();
+	// 	} else {
+	// 		$original_link    = Input::get('original_link');
+
+	// 		$video = Video::create(array(
+	// 			'original_link'	=> $original_link,
+	// 			'status'		=> VIDEO_FOR_APPROVAL
+	// 		));
+
+	// 		if ($video){
+	// 			// Mail::send('emails.auth.activate', array('link' => URL::route('account-activate', $code) , 'name' => $name), function($message) use ($user){
+ // 			// 		$message->to($user->email, $user->name)->subject('Activate your account');
+	// 			// });
+
+	// 			Task::create(array(
+	// 				'type' => TASK_SUGGESTED_VIDEO,
+	// 				'user_id' => Auth::id(),
+	// 				'video_id' => $video->id
+	// 			));
+
+	// 			return Redirect::route('videos-suggest')
+	// 					->with('success', 'Your suggestion was registered! Now it needs to be approved by the team.');
+	// 		}
+	// 	}
+	// }	
 }

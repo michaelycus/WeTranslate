@@ -85,7 +85,7 @@
 							<p class="text-center" ng-show="loading"><span class="fa fa-refresh fa-5x fa-spin"></span></p>
 
 							<div class="comment" ng-hide="loading" ng-repeat="comment in comments">
-								<img src="@{{ comment.user.photo }}" alt="" class="comment-avatar">
+								<img ng-src="@{{ comment.user.photo }}" alt="" class="comment-avatar">
 								<div class="comment-body">
 									<div class="comment-text">
 										<div class="comment-heading">

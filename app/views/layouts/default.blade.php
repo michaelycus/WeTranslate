@@ -126,18 +126,10 @@
 				</li>	
 				<li>
 					<a href="{{ URL::route('videos-finished') }}"><i class="menu-icon fa fa-check"></i><span class="mm-text">Finished</span></a>
-				</li>	
-
-				@if (Auth::user()->auth >= USER_AUTH_ADMIN)
-				<li>					
-					<a href="{{ URL::route('videos-for-approval') }}"><i class="menu-icon fa fa-legal"></i><span class="mm-text">For Approval </span><span class="label label-warning">{{ Video::forApproval() }}</span></a>
-				</li>		
-				@endif
+				</li>				
 				
 			</ul> <!-- / .navigation -->
-			<div class="menu-content">
-				<a href="{{ URL::route('videos-suggest') }}" class="btn btn-primary btn-block btn-outline dark"><i class="menu-icon fa fa-star"></i> Suggest video</a>
-			</div>
+
 		</div> <!-- / #main-menu-inner -->
 	</div> <!-- / #main-menu -->
 <!-- /4. $MAIN_MENU -->
@@ -148,6 +140,11 @@
 				<button type="button" class="close" data-dismiss="alert">×</button>
 				{{ Session::get('success') }}
 			</div>
+		@elseif (Session::has('fail'))
+			<div class="alert alert-danger alert-dark">
+				<button type="button" class="close" data-dismiss="alert">×</button>
+				{{ Session::get('fail') }}
+			</div>			
     	@endif
 		
 	@yield('content')

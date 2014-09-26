@@ -71,12 +71,12 @@ class AccountController extends BaseController{
 				->with('global', 'There was a problem signing you in.');
 	}
 
-	public function getSignup()
+	public function getSignUp()
 	{
 		return View::make('sign.signup');
 	}
 
-	public function postSignup()
+	public function postSignUp()
 	{
 		$validator = Validator::make(Input::all(), 
 			array(

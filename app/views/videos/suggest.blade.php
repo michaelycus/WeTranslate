@@ -88,6 +88,6 @@
 	init.push(function () {
 	})
 	window.PixelAdmin.start(init);
-</script
+</script>
 
 @stop

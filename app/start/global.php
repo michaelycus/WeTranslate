@@ -83,6 +83,12 @@ require app_path().'/filters.php';
 // load constants - Michael
 require app_path().'/config/constants.php';
 
+App::missing(function($e) {
+    $url = Request::fullUrl();
+    Log::warning("404 for URL: $url");
+    return Response::view('errors.not-found', array(), 404);
+});
+
 /**
  * Generate a querystring url for the application.
  *
@@ -112,3 +118,5 @@ require app_path().'/config/constants.php';
 //     }
 //     return $url;
 // }
+
+\Debugbar::disable();
